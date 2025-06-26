@@ -6,7 +6,7 @@ NAME		=	philo
 # The name list for regular and bonus source files.							#
 SRC			=	$(SRC_DIR)/ft_atoi.c	\
 				$(SRC_DIR)/philo.c		\
-				$(SRC_DIR)/utils.c
+				$(SRC_DIR)/init.c
 SRC_BON		=
 
 # The flags used to compile the objects.									#

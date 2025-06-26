@@ -1,18 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   mutex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/06/25 17:09:12 by sscheini          #+#    #+#             */
-/*   Updated: 2025/06/25 18:14:23 by sscheini         ###   ########.fr       */
+/*   Created: 2025/06/26 17:11:22 by sscheini          #+#    #+#             */
+/*   Updated: 2025/06/26 17:15:47 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+void	set_death_flag()
+{
+	
+}
 
-void start_philosophical_experiment(t_rules *table_rules)
+void	get_death_flag()
+{
+
+}
+
+void	set_print_flag()
+{
+
+}
+
+void	get_print_flag()
 {
 	
 }

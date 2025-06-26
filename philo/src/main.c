@@ -6,90 +6,19 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/06/25 18:13:52 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/06/26 17:09:57 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static void	destroy_mutex(t_rules *table)
-{
-	int	i;
-	int ans;
-
-	ans = 0;
-	i = -1;
-	if (pthread_mutex_destroy(&(table->death_mutex)) != 0)
-	{
-		ans = 1;
-		printf("Error: Unable to destroy %s mutex\n", "death");
-	}
-	if (pthread_mutex_destroy(&(table->print_mutex)) != 0)
-	{
-		ans = 1;
-		printf("Error: Unable to destroy %s mutex\n", "print");
-	}
-	while (++i < table->n_forks)
-		if (pthread_mutex_destroy(&(table->forks[i])) != 0)
-			ans = printf("Error: Unable to destroy fork mutex %d\n", i);
-	free(table->forks);
-	table->forks = NULL;
-	if (ans)
-		forcend(table, PH_MUTEXDERR);
-}
-
-static void	initialize_mutex(t_rules *table)
-{
-	int	i;
-
-	table->n_forks = 0;
-	if (pthread_mutex_init(&(table->death_mutex), NULL) != 0)
-		forcend(NULL, PH_MUTEXIERR);
-	if (pthread_mutex_init(&(table->print_mutex), NULL) != 0)
-	{
-		if (pthread_mutex_destroy(&(table->death_mutex)))
-			printf("Error: Unable to destroy mutex\n");
-		forcend(table, PH_MUTEXIERR);
-	}
-	table->forks = malloc(sizeof(pthread_mutex_t) * table->n_philo);
-	if (!table->forks)
-		forcend(table, PH_MEMFAIL);
-	i = -1;
-	while (++i < table->n_philo)
-	{
-		if (pthread_mutex_init(&(table->forks[i]), NULL) != 0)
-			forcend(table, PH_MUTEXIERR);
-		table->n_forks++;
-	}
-}
-
-static void	check_args(int argc, char **argv, t_rules *table_rules)
-{
-	int	i;
-
-	if (argc < 5 || argc > 6)
-		forcend(NULL, PH_INVARGC);
-	i = 0;
-	memset(table_rules, 0, sizeof(t_rules));
-	table_rules->death_flag = 0;
-	table_rules->n_philo = ft_atoi(argv[++i]);
-	if (table_rules->n_philo <= 0)
-		forcend(NULL, PH_INVARGV);
-	table_rules->time_to_die = ft_atoi(argv[++i]);
-	if (table_rules->time_to_die <= 0)
-		forcend(NULL, PH_INVARGV);
-	table_rules->time_to_eat = ft_atoi(argv[++i]);
-	if (table_rules->time_to_eat < 0)
-		forcend(NULL, PH_INVARGV);
-	table_rules->time_to_sleep = ft_atoi(argv[++i]);
-	if (table_rules->time_to_sleep < 0)
-		forcend(NULL, PH_INVARGV);
-	table_rules->meals_required = ft_atoi(argv[++i]);
-	if (table_rules->meals_required < 0)
-		forcend(NULL, PH_INVARGV);
-}
-
-void	forcend(t_rules *table, int errmsg)
+/**
+ * Philosopher failsafe, in case of error, frees all memory that could remain
+ * allocated in the main structure, and destroy any created mutex.
+ * @param table A pointer to the main enviroment philosopher structure.
+ * @param errmsg The error number which points to its error string.
+ */
+void	forcend(t_rules *table, t_philosopher *chairs, int errmsg)
 {
 	const char	*msg[] = {
 		"Success",
@@ -98,7 +27,10 @@ void	forcend(t_rules *table, int errmsg)
 		"Mutex initialization failed",
 		"Mutex destruction failed",
 		"Memory allocation failed",
+		"Thread creation failed"
 	};
+	if (chairs)
+		free(chairs);
 	if (table)
 		if (table->forks)
 			destroy_mutex(table);
@@ -107,13 +39,52 @@ void	forcend(t_rules *table, int errmsg)
 	exit(errmsg);
 }
 
+/**
+ * Verifies user input and initializes the main enviroment structure with
+ * all its data.
+ * If either "n_philo" or "time_to_die" are 0, or if any other input 
+ * number is negative, then the program exits with forcend(2). If the amount
+ * of arguments isn't valid, the program exits with forcend(1).
+ * @param argc The amount of main arguments.
+ * @param argv An array of STRINGS with all the main arguments.
+ * @param table A pointer to the main enviroment philosopher structure.
+ * @note An argument that starts with anything other than a number, is read
+ * as 0.
+ */
+static void	check_args(int argc, char **argv, t_rules *table)
+{
+	int	i;
+
+	if (argc < 5 || argc > 6)
+		forcend(NULL, NULL, PH_INVARGC);
+	i = 0;
+	memset(table, 0, sizeof(t_rules));
+	table->death_flag = -1;
+	table->n_philo = ft_atoi(argv[++i]);
+	if (table->n_philo <= 0)
+		forcend(NULL, NULL, PH_INVARGV);
+	table->time_to_die = ft_atoi(argv[++i]);
+	if (table->time_to_die <= 0)
+		forcend(NULL, NULL, PH_INVARGV);
+	table->time_to_eat = ft_atoi(argv[++i]);
+	if (table->time_to_eat < 0)
+		forcend(NULL, NULL, PH_INVARGV);
+	table->time_to_sleep = ft_atoi(argv[++i]);
+	if (table->time_to_sleep < 0)
+		forcend(NULL, NULL, PH_INVARGV);
+	table->meals_required = ft_atoi(argv[++i]);
+	if (table->meals_required < 0)
+		forcend(NULL, NULL, PH_INVARGV);
+}
+
 int	main(int argc, char **argv)
 {
-	t_rules	table_rules;
+	t_philosopher	*chairs;
+	t_rules			table;
 
-	check_args(argc, argv, &table_rules);
-	initialize_mutex(&table_rules);
-	start_philosophical_experiment(&table_rules);
-	destroy_mutex(&table_rules);
-	return (PH_SUCCESS);
+	check_args(argc, argv, &table);
+	initialize_mutex(&table);
+	chairs = start_philosophical_experiment(&table);
+	pthread_join(table.monitor_id, NULL);
+	forcend(table, chairs, PH_SUCCESS);
 }
