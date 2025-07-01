@@ -4,13 +4,14 @@
 NAME		=	philo
 
 # The name list for regular and bonus source files.							#
-SRC			=	$(SRC_DIR)/ft_atoi.c	\
-				$(SRC_DIR)/philo.c		\
-				$(SRC_DIR)/init.c
+SRC			=	$(SRC_DIR)/ft_atoi.c		\
+				$(SRC_DIR)/init.c			\
+				$(SRC_DIR)/mtx_actions.c	\
+				$(SRC_DIR)/philo.c			
 SRC_BON		=
 
 # The flags used to compile the objects.									#
-CFLAGS		=	-Wall -Wextra -Werror
+CFLAGS		=	-g -Wall -Wextra -Werror
 
 # The flags used to create dependency files.								#
 DFLAGS		=	-MMD -MP

@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 18:42:32 by sscheini          #+#    #+#             */
-/*   Updated: 2025/06/25 16:55:28 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/01 18:34:49 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ int	ft_atoi(const char *nptr)
 
 	if (!nptr)
 		return (0);
+	//do max and min int!
 	i = 0;
 	nbr = 0;
 	sign = 1;

@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/06/26 17:09:57 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/01 21:28:30 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,10 @@
  * Philosopher failsafe, in case of error, frees all memory that could remain
  * allocated in the main structure, and destroy any created mutex.
  * @param table A pointer to the main enviroment philosopher structure.
+ * @param seats A pointer to the T_PHILOSOPHER structure array.
  * @param errmsg The error number which points to its error string.
  */
-void	forcend(t_rules *table, t_philosopher *chairs, int errmsg)
+void	forcend(t_rules *table, t_philosopher *seats, int errmsg)
 {
 	const char	*msg[] = {
 		"Success",
@@ -29,14 +30,13 @@ void	forcend(t_rules *table, t_philosopher *chairs, int errmsg)
 		"Memory allocation failed",
 		"Thread creation failed"
 	};
-	if (chairs)
-		free(chairs);
+	if (seats)
+		free(seats);
 	if (table)
-		if (table->forks)
+		if (&(table->forks) || &(table->meals))
 			destroy_mutex(table);
 	if (errmsg)
 		printf("Error: %s\n", msg[errmsg]);
-	exit(errmsg);
 }
 
 /**
@@ -56,35 +56,36 @@ static void	check_args(int argc, char **argv, t_rules *table)
 	int	i;
 
 	if (argc < 5 || argc > 6)
-		forcend(NULL, NULL, PH_INVARGC);
+		forcend(NULL, NULL, PH_ARG_CINV);
 	i = 0;
 	memset(table, 0, sizeof(t_rules));
 	table->death_flag = -1;
 	table->n_philo = ft_atoi(argv[++i]);
 	if (table->n_philo <= 0)
-		forcend(NULL, NULL, PH_INVARGV);
+		forcend(NULL, NULL, PH_ARG_VINV);
 	table->time_to_die = ft_atoi(argv[++i]);
-	if (table->time_to_die <= 0)
-		forcend(NULL, NULL, PH_INVARGV);
+	if (table->time_to_die < 0)
+		forcend(NULL, NULL, PH_ARG_VINV);
 	table->time_to_eat = ft_atoi(argv[++i]);
 	if (table->time_to_eat < 0)
-		forcend(NULL, NULL, PH_INVARGV);
+		forcend(NULL, NULL, PH_ARG_VINV);
 	table->time_to_sleep = ft_atoi(argv[++i]);
 	if (table->time_to_sleep < 0)
-		forcend(NULL, NULL, PH_INVARGV);
+		forcend(NULL, NULL, PH_ARG_VINV);
 	table->meals_required = ft_atoi(argv[++i]);
 	if (table->meals_required < 0)
-		forcend(NULL, NULL, PH_INVARGV);
+		forcend(NULL, NULL, PH_ARG_VINV);
 }
 
 int	main(int argc, char **argv)
 {
-	t_philosopher	*chairs;
 	t_rules			table;
+	t_monitor		*waiter;
 
 	check_args(argc, argv, &table);
 	initialize_mutex(&table);
-	chairs = start_philosophical_experiment(&table);
+	waiter = start_philosophical_experiment(&table);
 	pthread_join(table.monitor_id, NULL);
-	forcend(table, chairs, PH_SUCCESS);
+	forcend(waiter->table, waiter->seats, PH_SUCCESS);
+	free(waiter);
 }
