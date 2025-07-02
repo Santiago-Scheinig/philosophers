@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 17:11:22 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 18:12:33 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/02 18:45:11 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,12 +103,10 @@ static int	get_time_of_dinner(struct timeval start_time)
 void	to_print_access(t_philosopher *seat, t_mtx_print action)
 {
 	long	ms_tv;
-	int		death_status;
 
-	death_status = to_death_flag(seat->table, MTX_FLAG_READ);
 	ms_tv = get_time_of_dinner(seat->table->start_time);
 	pthread_mutex_lock(&(seat->table->print_mutex));
-	if (!death_status)
+	if (!to_death_flag(seat->table, MTX_FLAG_READ))
 	{
 		if (action == MTX_PRINT_DEATH)
 		{
@@ -118,7 +116,10 @@ void	to_print_access(t_philosopher *seat, t_mtx_print action)
 		else if (action == MTX_PRINT_EAT)
 			printf("%010lims %i is eating.\n", ms_tv, seat->id);
 		else if (action == MTX_PRINT_FORK)
+		{
 			printf("%010lims %i has taken a fork.\n", ms_tv, seat->id);
+			printf("%010lims %i has taken a fork.\n", ms_tv, seat->id);
+		}
 		else if (action == MTX_PRINT_SLEEP)
 			printf("%010lims %i is sleeping.\n", ms_tv, seat->id);
 		else if (action == MTX_PRINT_THINK)

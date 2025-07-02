@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 20:28:51 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 18:25:48 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/02 18:45:57 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,12 @@ void	grab_forks(t_philosopher *seat)
 	if (!(seat->id % 2))
 	{
 		pthread_mutex_lock(seat->left_fork);
-		to_print_access(seat, MTX_PRINT_FORK);
 		pthread_mutex_lock(seat->right_fork);
 		to_print_access(seat, MTX_PRINT_FORK);
 	}
 	else
 	{
 		pthread_mutex_lock(seat->right_fork);
-		to_print_access(seat, MTX_PRINT_FORK);
 		pthread_mutex_lock(seat->left_fork);
 		to_print_access(seat, MTX_PRINT_FORK);
 	}
@@ -73,9 +71,9 @@ void	*philo(void *arg)
 	seat = (t_philosopher *) arg;
 	while (to_death_flag(seat->table, MTX_FLAG_READ) < 0)
 		usleep(100);
+	gettimeofday(&(seat->last_meal_time), NULL);
 	while (!to_death_flag(seat->table, MTX_FLAG_READ))
 	{
-		gettimeofday(&(seat->last_meal_time), NULL);
 		to_print_access(seat, MTX_PRINT_THINK);
 		eating(seat);
 		to_print_access(seat, MTX_PRINT_SLEEP);

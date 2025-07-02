@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:52:48 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 17:39:48 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/02 18:48:34 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,8 +216,6 @@ void		to_print_access(t_philosopher *seat, t_mtx_print action);
 void		*monitorize(void *arg);
 
 void		*philo(void *arg);
-
-int			cronometer(struct timeval start, struct timeval last, long limit);
 
 /**
  * Finds the first number on a STRING with a decimal base.

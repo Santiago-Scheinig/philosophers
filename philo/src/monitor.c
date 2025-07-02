@@ -6,22 +6,24 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 17:16:20 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 18:16:31 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/02 18:57:42 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	cronometer(struct timeval start, struct timeval last, long limit)
+static int	cronometer(struct timeval last_meal, long ms_death)
 {
-	long			ms_last;
-	long			ms_start;
+	struct timeval	day_time;
+	long			ms_last_meal;
+	long			ms_day_time;
 
-	if (!last.tv_sec && !last.tv_usec)
+	if (!last_meal.tv_sec && !last_meal.tv_usec)
 		return (0);
-	ms_last = (last.tv_sec * 1000L) + (last.tv_usec / 1000);
-	ms_start = (start.tv_sec * 1000L) + (start.tv_usec / 1000);
-	if (limit <= ms_last - ms_start)
+	gettimeofday(&day_time, NULL);
+	ms_last_meal = (last_meal.tv_sec * 1000L) + (last_meal.tv_usec / 1000);
+	ms_day_time = (day_time.tv_sec * 1000L) + (day_time.tv_usec / 1000);
+	if (ms_death <= ms_day_time - ms_last_meal)
 		return (1);
 	return (0);
 }
@@ -38,8 +40,8 @@ static int	check_dinner_status(t_monitor *waiter)
 	meals_required = waiter->table->meals_required;
 	while (++i < waiter->table->n_philo)
 	{
-		last_meal = waiter->seats[i].last_meal_time;
- 		if (cronometer(waiter->table->start_time, last_meal, waiter->table->time_to_die))
+		last_meal = waiter->seats[i].last_meal_time;//do a mutex
+ 		if (cronometer(last_meal, waiter->table->time_to_die))
 		{
 			to_print_access(&(waiter->seats[i]), MTX_PRINT_DEATH);
 			return (0);
@@ -47,7 +49,7 @@ static int	check_dinner_status(t_monitor *waiter)
 		if (to_meals_value(&(waiter->seats[i]), MTX_FLAG_READ) < meals_required)
 			ans++;
 	}
-	if (!ans && meals_required)
+	if (!ans && meals_required > 0)
 		return (0);
 	return (1);
 }
