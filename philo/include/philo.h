@@ -6,13 +6,14 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:52:48 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/01 21:00:59 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/02 17:39:48 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
+# include <sys/time.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
@@ -91,7 +92,7 @@ typedef struct s_rules
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				meals_required;
-	long long		start_time;
+	struct timeval	start_time;
 	int				death_flag;
 	pthread_t		monitor_id;
 	pthread_mutex_t	death_mutex;
@@ -120,8 +121,8 @@ typedef struct s_philosopher
 {
 	int				id;
 	int				meals_eaten;
-	long long		last_meal_time;
-	pthread_t		thread_id;
+	struct timeval	last_meal_time;
+	pthread_t		thd_id;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
 	pthread_mutex_t	*meal_mutex;
@@ -155,7 +156,7 @@ typedef	struct s_monitor
  * 
  * @param table The main enviroment philosopher structure.
  */
-void			initialize_mutex(t_rules *table);
+int		initialize_mutex(t_rules *table);
 
 /**
  * Destroys every mutex created to run the philosopher program.
@@ -164,7 +165,7 @@ void			initialize_mutex(t_rules *table);
  * printed on screen detailing the failed mutex, the program
  * then exits with forcend(4).
  */
-void			destroy_mutex(t_rules *table);
+int		destroy_mutex(t_rules *table);
 
 /**
  * Initializes all necesary threads to run the philosopher program.
@@ -172,7 +173,7 @@ void			destroy_mutex(t_rules *table);
  * @param table A pointer to the main enviroment philosopher structure.
  * @return A pointer to the allocated array of T_PHILOSOPHERS.
  */
-t_monitor	*start_philosophical_experiment(t_rules *table);
+int			start_philosophical_experiment(t_rules *table, t_philosopher **seats);
 
 /*--------------------------------------------------------------------------*/
 /*------------------------------ MUTEX_ACTIONS -----------------------------*/
@@ -186,7 +187,7 @@ t_monitor	*start_philosophical_experiment(t_rules *table);
  * @param table A pointer to the main experiment structure.
  * @param action The action to perform into death_flag.
  */
-int				to_death_flag(t_rules *table, t_mtx_flag action);
+int			to_death_flag(t_rules *table, t_mtx_flag action);
 
 /**
  * Using the t_mtx_flag enum, executes instructions on the meals_eaten
@@ -197,7 +198,7 @@ int				to_death_flag(t_rules *table, t_mtx_flag action);
  * variable.
  * @param action The action to perfrom into meals_eaten
  */
-int				to_meals_value(t_philosopher *seat, t_mtx_flag action);
+int			to_meals_value(t_philosopher *seat, t_mtx_flag action);
 
 /**
  * Using the T_MTX_PRINT enum, prints a specific message on STDOUT linked to
@@ -206,15 +207,17 @@ int				to_meals_value(t_philosopher *seat, t_mtx_flag action);
  * @param seat A pointer to the T_PHILOSOPHER linked to the message.
  * @param action The action to perform into death_flag.
  */
-void			to_print_access(t_philosopher *seat, t_mtx_print action);
+void		to_print_access(t_philosopher *seat, t_mtx_print action);
 
 /*--------------------------------------------------------------------------*/
 /*---------------------------------- UTILS ---------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void			*monitorize(void *arg);
+void		*monitorize(void *arg);
 
-void			*philosophizing(void *arg);
+void		*philo(void *arg);
+
+int			cronometer(struct timeval start, struct timeval last, long limit);
 
 /**
  * Finds the first number on a STRING with a decimal base.
@@ -225,7 +228,7 @@ void			*philosophizing(void *arg);
  * amount of spaces and one sign; but the next character must 
  * be a digit, if not or str doesn't exists, returns 0.
  */
-int				ft_atoi(const char *nptr);
+int			ft_atoi(const char *nptr);
 
 /**
  * Philosopher failsafe, in case of error, frees all memory that could remain
@@ -233,6 +236,6 @@ int				ft_atoi(const char *nptr);
  * @param table A pointer to the main environment philosopher structure.
  * @param errmsg The error number which points to its error string.
  */
-void			forcend(t_rules *table, t_philosopher *chairs, int errmsg);
+int		forcend(t_rules *table, t_philosopher *chairs, int errmsg);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 17:11:22 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/01 20:38:45 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/02 18:12:33 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,18 @@ int	to_meals_value(t_philosopher *seat, t_mtx_flag action)
 	return (val);
 }
 
+static int	get_time_of_dinner(struct timeval start_time)
+{
+	struct timeval	tv;
+	long			ms_start;
+	long			ms_tv;
+
+	gettimeofday(&tv, NULL);	
+	ms_tv = (tv.tv_sec * 1000L) + (tv.tv_usec / 1000);
+	ms_start = (start_time.tv_sec * 1000L) + (start_time.tv_usec / 1000);
+	return (ms_tv - ms_start);
+}
+
 /**
  * Using the T_MTX_PRINT enum, prints a specific message on STDOUT linked to
  * the pointer to a T_PHILOSOPHER seat, avoiding print chunks using a mutex.
@@ -90,9 +102,27 @@ int	to_meals_value(t_philosopher *seat, t_mtx_flag action)
  */
 void	to_print_access(t_philosopher *seat, t_mtx_print action)
 {
+	long	ms_tv;
+	int		death_status;
+
+	death_status = to_death_flag(seat->table, MTX_FLAG_READ);
+	ms_tv = get_time_of_dinner(seat->table->start_time);
 	pthread_mutex_lock(&(seat->table->print_mutex));
-	if (action == MTX_PRINT_EAT)
-		printf("%i is eating.\n", seat->id);
-	//All executions needed to print the correct msgs.
+	if (!death_status)
+	{
+		if (action == MTX_PRINT_DEATH)
+		{
+			to_death_flag(seat->table, MTX_FLAG_ON);
+			printf("%010lims %i died.\n", ms_tv, seat->id);
+		}
+		else if (action == MTX_PRINT_EAT)
+			printf("%010lims %i is eating.\n", ms_tv, seat->id);
+		else if (action == MTX_PRINT_FORK)
+			printf("%010lims %i has taken a fork.\n", ms_tv, seat->id);
+		else if (action == MTX_PRINT_SLEEP)
+			printf("%010lims %i is sleeping.\n", ms_tv, seat->id);
+		else if (action == MTX_PRINT_THINK)
+			printf("%010lims %i is thinking.\n", ms_tv, seat->id);
+	}
 	pthread_mutex_unlock(&(seat->table->print_mutex));
 }

@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/01 21:28:30 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/02 18:16:11 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  * @param seats A pointer to the T_PHILOSOPHER structure array.
  * @param errmsg The error number which points to its error string.
  */
-void	forcend(t_rules *table, t_philosopher *seats, int errmsg)
+int	forcend(t_rules *table, t_philosopher *seats, int errmsg)
 {
 	const char	*msg[] = {
 		"Success",
@@ -34,9 +34,10 @@ void	forcend(t_rules *table, t_philosopher *seats, int errmsg)
 		free(seats);
 	if (table)
 		if (&(table->forks) || &(table->meals))
-			destroy_mutex(table);
+			return (destroy_mutex(table));
 	if (errmsg)
 		printf("Error: %s\n", msg[errmsg]);
+	return (errmsg);
 }
 
 /**
@@ -51,41 +52,45 @@ void	forcend(t_rules *table, t_philosopher *seats, int errmsg)
  * @note An argument that starts with anything other than a number, is read
  * as 0.
  */
-static void	check_args(int argc, char **argv, t_rules *table)
+static int	check_args(int argc, char **argv, t_rules *table)
 {
 	int	i;
 
 	if (argc < 5 || argc > 6)
-		forcend(NULL, NULL, PH_ARG_CINV);
+		return (forcend(NULL, NULL, PH_ARG_CINV));
 	i = 0;
 	memset(table, 0, sizeof(t_rules));
 	table->death_flag = -1;
 	table->n_philo = ft_atoi(argv[++i]);
 	if (table->n_philo <= 0)
-		forcend(NULL, NULL, PH_ARG_VINV);
+		return (forcend(NULL, NULL, PH_ARG_VINV));
 	table->time_to_die = ft_atoi(argv[++i]);
 	if (table->time_to_die < 0)
-		forcend(NULL, NULL, PH_ARG_VINV);
+		return (forcend(NULL, NULL, PH_ARG_VINV));
 	table->time_to_eat = ft_atoi(argv[++i]);
 	if (table->time_to_eat < 0)
-		forcend(NULL, NULL, PH_ARG_VINV);
+		return (forcend(NULL, NULL, PH_ARG_VINV));
 	table->time_to_sleep = ft_atoi(argv[++i]);
 	if (table->time_to_sleep < 0)
-		forcend(NULL, NULL, PH_ARG_VINV);
+		return (forcend(NULL, NULL, PH_ARG_VINV));
 	table->meals_required = ft_atoi(argv[++i]);
 	if (table->meals_required < 0)
-		forcend(NULL, NULL, PH_ARG_VINV);
+		return (forcend(NULL, NULL, PH_ARG_VINV));
+	return (PH_SUCCESS);
 }
 
 int	main(int argc, char **argv)
 {
 	t_rules			table;
-	t_monitor		*waiter;
+	t_philosopher	*seats;
 
-	check_args(argc, argv, &table);
-	initialize_mutex(&table);
-	waiter = start_philosophical_experiment(&table);
-	pthread_join(table.monitor_id, NULL);
-	forcend(waiter->table, waiter->seats, PH_SUCCESS);
-	free(waiter);
+	if (check_args(argc, argv, &table))
+		return (1);
+	if (initialize_mutex(&table))
+		return (1);
+	if (start_philosophical_experiment(&table, &seats))
+		return (1);
+	if (pthread_join(table.monitor_id, NULL) != 0)
+		printf("Error: Unable to join monitor thread");
+	return (forcend(&table, seats, PH_SUCCESS));
 }

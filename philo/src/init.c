@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 17:09:12 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/01 21:00:43 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/02 18:17:36 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
  * printed on screen detailing the failed mutex, the program
  * then exits with forcend(4).
  */
-void	destroy_mutex(t_rules *table)
+int	destroy_mutex(t_rules *table)
 {
 	int	i;
 	int ans;
@@ -37,14 +37,15 @@ void	destroy_mutex(t_rules *table)
 		if (table->meals && pthread_mutex_destroy(&(table->meals[i])) != 0)
 			ans += printf("Error: Unable to destroy fork mutex %d\n", i);
 	}
-	if (&(table->forks))
+	if (table->forks)
 		free(table->forks);
-	if (&(table->meals))
+	if (table->meals)
 		free(table->meals);
 	table->forks = NULL;
 	table->meals = NULL;
 	if (ans)
-		forcend(table, NULL, PH_MTX_DERR);
+		return (forcend(table, NULL, PH_MTX_DERR));
+	return (PH_SUCCESS);
 }
 
 /**
@@ -58,32 +59,29 @@ void	destroy_mutex(t_rules *table)
  * 
  * @param table A pointer to the main enviroment philosopher structure.
  */
-void	initialize_mutex(t_rules *table)
+int	initialize_mutex(t_rules *table)
 {
 	int	i;
 
 	table->n_forks = 0;
 	if (pthread_mutex_init(&(table->death_mutex), NULL) != 0)
-		forcend(NULL, NULL, PH_MTX_IERR);
+		return (forcend(NULL, NULL, PH_MTX_IERR));
 	if (pthread_mutex_init(&(table->print_mutex), NULL) != 0)
-	{
-		if (pthread_mutex_destroy(&(table->death_mutex)))
-			printf("Error: Unable to destroy mutex\n");
-		forcend(table, NULL, PH_MTX_IERR);
-	}
+		return (forcend(table, NULL, PH_MTX_IERR));
 	table->forks = malloc(sizeof(pthread_mutex_t) * table->n_philo);
 	table->meals = malloc(sizeof(pthread_mutex_t) * table->n_philo);
 	if (!table->meals || !table->forks)
-		forcend(table, NULL, PH_MEM_AERR);
+		return (forcend(table, NULL, PH_MEM_AERR));
 	i = -1;
 	while (++i < table->n_philo)
 	{
 		if (pthread_mutex_init(&(table->forks[i]), NULL) != 0)
-			forcend(table, NULL, PH_MTX_IERR);
+			return (forcend(table, NULL, PH_MTX_IERR));
 		if (pthread_mutex_init(&(table->meals[i]), NULL) != 0)
-			forcend(table, NULL, PH_MTX_IERR);
+			return (forcend(table, NULL, PH_MTX_IERR));
 		table->n_forks++;
 	}
+	return (PH_SUCCESS);
 }
 
 /**
@@ -94,7 +92,7 @@ void	initialize_mutex(t_rules *table)
  * @note Once the monitor is correctly created, it's rutine will start
  * the experiment.
  */
-static t_monitor	*create_monitor(t_rules *table, t_philosopher *seats)
+static int create_monitor(t_rules *table, t_philosopher *seats)
 {
 	t_monitor	*waiter;
 	
@@ -108,7 +106,7 @@ static t_monitor	*create_monitor(t_rules *table, t_philosopher *seats)
 		to_death_flag(table, MTX_FLAG_ON);
 		forcend(table, seats, PH_THD_CERR);
 	}
-	return (waiter);
+	return (PH_SUCCESS);
 }
 	
 /**
@@ -117,31 +115,28 @@ static t_monitor	*create_monitor(t_rules *table, t_philosopher *seats)
  * @param table A pointer to the main enviroment philosopher structure.
  * @return A pointer to the allocated array of T_PHILOSOPHERS.
  */
-t_monitor	*start_philosophical_experiment(t_rules *table)
+int	start_philosophical_experiment(t_rules *table, t_philosopher **seats)
 {
-	t_philosopher	*seats;
-	int				i;
+	int	i;
 
-	seats = malloc(table->n_philo * sizeof(t_philosopher));
-	if (!seats)
+	(*seats) = malloc(table->n_philo * sizeof(t_philosopher));
+	if (!(*seats))
 		forcend(table, NULL, PH_MEM_AERR);
 	i = -1;
 	while (++i < table->n_philo)
 	{
-		memset(&seats[i], 0, sizeof(t_philosopher));
-		seats[i].id = i;
-		seats[i].meals_eaten = 0;
-		seats[i].left_fork = &(table->forks[i]);
-		seats[i].right_fork = &(table->forks[(i + 1) % table->n_forks]);
-		seats[i].meal_mutex = &(table->meals[i]);
-		seats[i].table = table;
-		if (pthread_create(&(seats[i].thread_id), NULL, philosophizing, &seats[i]))
+		memset(&(*seats)[i], 0, sizeof(t_philosopher));
+		(*seats)[i].id = i;
+		(*seats)[i].meals_eaten = 0;
+		(*seats)[i].left_fork = &(table->forks[i]);
+		(*seats)[i].right_fork = &(table->forks[(i + 1) % table->n_forks]);
+		(*seats)[i].meal_mutex = &(table->meals[i]);
+		(*seats)[i].table = table;
+		if (pthread_create(&((*seats)[i].thd_id), NULL, philo, &(*seats)[i]))
 		{
 			to_death_flag(table, MTX_FLAG_ON);
-			forcend(table, seats, PH_THD_CERR);
+			forcend(table, (*seats), PH_THD_CERR);
 		}
-		if (pthread_detach(seats[i].thread_id))
-			printf("Error: Unable to detatch %i philosopher thread\n", i);
 	}
-	return (create_monitor(table, seats));
+	return (create_monitor(table, (*seats)));
 }

@@ -7,6 +7,7 @@ NAME		=	philo
 SRC			=	$(SRC_DIR)/ft_atoi.c		\
 				$(SRC_DIR)/init.c			\
 				$(SRC_DIR)/mtx_actions.c	\
+				$(SRC_DIR)/monitor.c		\
 				$(SRC_DIR)/philo.c			
 SRC_BON		=
 
