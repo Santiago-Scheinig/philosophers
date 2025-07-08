@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 17:09:12 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 18:53:43 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/08 20:47:20 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,13 +98,13 @@ static int create_monitor(t_rules *table, t_philosopher *seats)
 	
 	waiter = malloc(sizeof(t_monitor));
 	if (!waiter)
-		forcend(table, seats, PH_MEM_AERR);
+		return (forcend(table, seats, PH_MEM_AERR));
 	waiter->table = table;
 	waiter->seats = seats;
 	if (pthread_create(&(waiter->table->monitor_id), NULL, monitorize, waiter))
 	{
 		to_death_flag(table, MTX_FLAG_ON);
-		forcend(table, seats, PH_THD_CERR);
+		return (forcend(table, seats, PH_THD_CERR));
 	}
 	return (PH_SUCCESS);
 }
@@ -121,7 +121,7 @@ int	start_philosophical_experiment(t_rules *table, t_philosopher **seats)
 
 	(*seats) = malloc(table->n_philo * sizeof(t_philosopher));
 	if (!(*seats))
-		forcend(table, NULL, PH_MEM_AERR);
+		return (forcend(table, NULL, PH_MEM_AERR));
 	i = -1;
 	while (++i < table->n_philo)
 	{
@@ -135,7 +135,7 @@ int	start_philosophical_experiment(t_rules *table, t_philosopher **seats)
 		if (pthread_create(&((*seats)[i].thd_id), NULL, philo, &(*seats)[i]))
 		{
 			to_death_flag(table, MTX_FLAG_ON);
-			forcend(table, (*seats), PH_THD_CERR);
+			return (forcend(table, (*seats), PH_THD_CERR));
 		}
 	}
 	return (create_monitor(table, (*seats)));
