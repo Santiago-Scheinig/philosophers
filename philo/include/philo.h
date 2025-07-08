@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:52:48 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 18:48:34 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/08 17:44:40 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,17 @@ typedef	enum e_philo_errno
 	PH_MEM_AERR,		// Memory allocation failed
 	PH_THD_CERR			// Thread creation failed
 }	t_philo_errno;		// @param enum_format PH_*
+
+/**
+ * An enumeration list of time codes to identify specific actions to perform
+ * inside of a mutexed timestamp.
+ */
+typedef enum e_mtx_time
+{
+	MTX_TIME_IS	= 0,	// Returns timestamp depending on eating flag value
+	MTX_TIME_ISFULL,	// To modify the eating flag to 0
+	MTX_TIME_ISEATING	// To modify the eating flag to 1
+}	t_mtx_time;			// @param enum_format MTX_TIME_*
 
 /**
  * An enumeration list of flag codes to identify specific actions to perform
@@ -82,7 +93,8 @@ typedef	enum e_mtx_print
  * @param monitor_id The id of the PTHREAD_T to the monitor.
  * @param death_mutex A mutex linked to death_flag.
  * @param print_mutex A mutex linked to printf.
- * @param forks; A pointer to a PTHREAD_T ARRAY to the forks in table order.
+ * @param forks A pointer to a PTHREAD_T ARRAY to the forks in table order.
+ * @param meals A pointer to a PTHREAD_T ARRAY to mute the timestamps of meals.
  */
 typedef struct s_rules
 {
@@ -121,6 +133,7 @@ typedef struct s_philosopher
 {
 	int				id;
 	int				meals_eaten;
+	int				is_eating;
 	struct timeval	last_meal_time;
 	pthread_t		thd_id;
 	pthread_mutex_t	*left_fork;
@@ -188,6 +201,17 @@ int			start_philosophical_experiment(t_rules *table, t_philosopher **seats);
  * @param action The action to perform into death_flag.
  */
 int			to_death_flag(t_rules *table, t_mtx_flag action);
+
+/**
+ * Using the t_mtx_time enum, executes instructions on the last_meal timestamp
+ * variable, saved on the T_PHILOSOPHER structure, avoiding data races using
+ * a mutex.
+ * 
+ * @param seat A pointer to a T_PHILOSOPHER structure linked to the last_meal
+ * timestamp variable.
+ * @param action The action to perfrom into meals_eaten
+ */
+struct timeval	to_time_value(t_philosopher *seat, t_mtx_time action);
 
 /**
  * Using the t_mtx_flag enum, executes instructions on the meals_eaten

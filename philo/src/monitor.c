@@ -6,24 +6,22 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 17:16:20 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 18:57:42 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/08 18:29:08 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static int	cronometer(struct timeval last_meal, long ms_death)
+int	cronometer(struct timeval last_meal, long ms_death)
 {
 	struct timeval	day_time;
 	long			ms_last_meal;
 	long			ms_day_time;
 
-	if (!last_meal.tv_sec && !last_meal.tv_usec)
-		return (0);
 	gettimeofday(&day_time, NULL);
 	ms_last_meal = (last_meal.tv_sec * 1000L) + (last_meal.tv_usec / 1000);
 	ms_day_time = (day_time.tv_sec * 1000L) + (day_time.tv_usec / 1000);
-	if (ms_death <= ms_day_time - ms_last_meal)
+	if (ms_death < ms_day_time - ms_last_meal)
 		return (1);
 	return (0);
 }
@@ -40,7 +38,7 @@ static int	check_dinner_status(t_monitor *waiter)
 	meals_required = waiter->table->meals_required;
 	while (++i < waiter->table->n_philo)
 	{
-		last_meal = waiter->seats[i].last_meal_time;//do a mutex
+		last_meal = to_time_value(&(waiter->seats[i]), MTX_TIME_IS);
  		if (cronometer(last_meal, waiter->table->time_to_die))
 		{
 			to_print_access(&(waiter->seats[i]), MTX_PRINT_DEATH);
@@ -60,13 +58,13 @@ void	*monitorize(void *arg)
 	int			i;
 
 	waiter = (t_monitor *) arg;
-	to_death_flag(waiter->table, MTX_FLAG_OFF);
 	gettimeofday(&(waiter->table->start_time), NULL);
+	to_death_flag(waiter->table, MTX_FLAG_OFF);
 	while (!to_death_flag(waiter->table, MTX_FLAG_READ))
 	{
+		usleep(500);
 		if (!check_dinner_status(waiter))
 			to_death_flag(waiter->table, MTX_FLAG_ON);
-		usleep(100);
 	}
 	i = -1;
 	while (++i < waiter->table->n_philo)

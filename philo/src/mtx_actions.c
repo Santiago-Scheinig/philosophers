@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 17:11:22 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 18:45:11 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/08 17:21:04 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,34 @@ int	to_meals_value(t_philosopher *seat, t_mtx_flag action)
 	return (val);
 }
 
+/**
+ * Using the t_mtx_time enum, executes instructions on the last_meal timestamp
+ * variable, saved on the T_PHILOSOPHER structure, avoiding data races using
+ * a mutex.
+ * 
+ * @param seat A pointer to a T_PHILOSOPHER structure linked to the last_meal
+ * timestamp variable.
+ * @param action The action to perfrom into meals_eaten
+ */
+struct timeval	to_time_value(t_philosopher *seat, t_mtx_time action)
+{
+	struct timeval	val;
+
+	gettimeofday(&val, NULL);
+	pthread_mutex_lock(seat->meal_mutex);
+	if (action == MTX_TIME_ISEATING)
+		seat->is_eating = 1;
+	if (action == MTX_TIME_ISFULL)
+	{
+		seat->is_eating = 0;
+		seat->last_meal_time = val;
+	}
+	if (action == MTX_TIME_IS && !seat->is_eating)
+		val = seat->last_meal_time;
+	pthread_mutex_unlock(seat->meal_mutex);
+	return (val);
+}
+
 static int	get_time_of_dinner(struct timeval start_time)
 {
 	struct timeval	tv;
@@ -118,7 +146,8 @@ void	to_print_access(t_philosopher *seat, t_mtx_print action)
 		else if (action == MTX_PRINT_FORK)
 		{
 			printf("%010lims %i has taken a fork.\n", ms_tv, seat->id);
-			printf("%010lims %i has taken a fork.\n", ms_tv, seat->id);
+			if (seat->table->n_philo > 1)
+				printf("%010lims %i has taken a fork.\n", ms_tv, seat->id);
 		}
 		else if (action == MTX_PRINT_SLEEP)
 			printf("%010lims %i is sleeping.\n", ms_tv, seat->id);
