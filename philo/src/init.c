@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 17:09:12 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 18:17:36 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/08 18:53:43 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,7 @@ int	start_philosophical_experiment(t_rules *table, t_philosopher **seats)
 	while (++i < table->n_philo)
 	{
 		memset(&(*seats)[i], 0, sizeof(t_philosopher));
-		(*seats)[i].id = i;
+		(*seats)[i].id = i + 1;
 		(*seats)[i].meals_eaten = 0;
 		(*seats)[i].left_fork = &(table->forks[i]);
 		(*seats)[i].right_fork = &(table->forks[(i + 1) % table->n_forks]);

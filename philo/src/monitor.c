@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 17:16:20 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 18:29:08 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/08 18:55:42 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int	cronometer(struct timeval last_meal, long ms_death)
 	gettimeofday(&day_time, NULL);
 	ms_last_meal = (last_meal.tv_sec * 1000L) + (last_meal.tv_usec / 1000);
 	ms_day_time = (day_time.tv_sec * 1000L) + (day_time.tv_usec / 1000);
-	if (ms_death < ms_day_time - ms_last_meal)
+	if (ms_death <= ms_day_time - ms_last_meal)
 		return (1);
 	return (0);
 }
