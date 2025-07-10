@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:52:48 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:56:15 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 19:00:43 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,14 +234,42 @@ int				to_meals_value(t_philosopher *seat, t_mtx_flag action);
 void			to_print_access(t_philosopher *seat, t_mtx_print action);
 
 /*--------------------------------------------------------------------------*/
-/*---------------------------------- UTILS ---------------------------------*/
+/*---------------------------- THREAD ROUTINES -----------------------------*/
 /*--------------------------------------------------------------------------*/
 
+/**
+ * The monitor thread routine.
+ * 
+ * - Sets the [start_time] of the dinner to current time.
+ * 
+ * - Initializes the dinner by setting the [death_flag] to false.
+ * 
+ * @param arg A pointer to the needed arguments of the routine. A pointer to
+ * the T_MONITOR structure in this case.
+ * @note If [death_flag] becomes true, it joins every philosopher thread and
+ * frees it's own structure. 
+ */
 void			*monitorize(void *arg);
 
+/**
+ * The philosopher thread routine.
+ * 
+ * - Sets the [last_meal_time] to [start_time].
+ * 
+ * - If odd, waits ([time_to_eat] / 2) to create eating waves.
+ * 
+ * - While [death_flag] is false: Thinks, eats and sleeps.
+ * 
+ * @param arg A pointer to the needed arguments of the routine. A pointer to
+ * the T_PHILOSOPHER structure in this case.
+ * @note If [n_philosopher] it's an odd amount, uses is_hungry() to set 
+ * priorities between waves.
+ */
 void			*philo(void *arg);
 
-int				cronometer(struct timeval last_meal, long ms_death);
+/*--------------------------------------------------------------------------*/
+/*---------------------------------- UTILS ---------------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /**
  * Finds the first number on a STRING with a decimal base.
