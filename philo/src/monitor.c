@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 17:16:20 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:01:49 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:28:50 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ int	cronometer(struct timeval last_meal, long ms_death)
  * thread has died, or fullfilled their [meals_to_eat] value.
  * 
  * @param waiter A pointer to the T_MONITOR structure.
- * @return Returns 0 if a thread died. Returns 1 if all the meals have been
- * successfully eaten by every philosopher. Returns 2 if no thread died and
+ * @return Returns 0 if a thread died or if all the meals have been
+ * successfully eaten by every philosopher. Returns 1 if no thread died and
  * there ain't a maximum amount of meals to be eaten.
  */
 static int	check_dinner_status(t_monitor *waiter)
@@ -66,7 +66,7 @@ static int	check_dinner_status(t_monitor *waiter)
 			ans++;
 	}
 	if (!ans && meals_required > 0)
-		return (2);
+		return (0);
 	return (1);
 }
 

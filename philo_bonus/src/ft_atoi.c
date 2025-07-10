@@ -1,14 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_atoi.c                                          :+:      :+:    :+:   */
+/*   ft_atoi_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 18:42:32 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/01 18:34:49 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:38:54 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#include <limits.h>
 
 static int	ft_isdigit(int c)
 {
@@ -34,10 +36,16 @@ static	int	ft_issign(int c)
 	return (0);
 }
 
+static	int	ft_islong(long nbr)
+{
+	if (nbr < INT_MIN || nbr > INT_MAX)
+		return (0);
+	return (nbr);
+}
+
 /**
  * Finds the first number on a STRING with a decimal base.
  * @param str The string where the base number is saved.
- * @param base The base in which the number must be found.
  * @return The decimal INT found on STR.
  * @note A number can, but is not forced to, start with any
  * amount of spaces and one sign; but the next character must 
@@ -45,13 +53,12 @@ static	int	ft_issign(int c)
  */
 int	ft_atoi(const char *nptr)
 {
-	int	i;
-	int	nbr;
-	int	sign;
+	int		i;
+	long	nbr;
+	int		sign;
 
 	if (!nptr)
 		return (0);
-	//do max and min int!
 	i = 0;
 	nbr = 0;
 	sign = 1;
@@ -60,12 +67,12 @@ int	ft_atoi(const char *nptr)
 	if (ft_issign(nptr[i]))
 		sign = ft_issign(nptr[i++]);
 	else if (!ft_isdigit(nptr[i]))
-		return (nbr);
+		return (ft_islong(nbr * sign));
 	if (ft_isdigit(nptr[i]))
 		nbr = nptr[i] - 48;
 	else
-		return (nbr);
+		return (ft_islong(nbr * sign));
 	while (ft_isdigit(nptr[i++ + 1]))
 		nbr = (nbr * 10) + (nptr[i] - 48);
-	return (nbr * sign);
+	return (ft_islong(nbr * sign));
 }
