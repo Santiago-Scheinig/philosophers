@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:26:02 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:56:24 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ int	forcend(t_rules *table, t_philosopher *seats, int errmsg)
 		"Memory allocation failed",
 		"Thread creation failed"
 	};
+
 	if (seats)
 		free(seats);
 	if (table)
@@ -90,7 +91,7 @@ int	main(int argc, char **argv)
 		return (1);
 	if (initialize_mutex(&table))
 		return (1);
-	if (start_philosophical_experiment(&table, &seats))
+	if (start_dinner(&table, &seats))
 		return (1);
 	if (pthread_join(table.monitor_id, NULL) != 0)
 		printf("Error: Unable to join monitor thread");

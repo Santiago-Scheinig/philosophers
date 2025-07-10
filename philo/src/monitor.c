@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 17:16:20 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:28:50 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:52:02 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,9 +45,9 @@ int	cronometer(struct timeval last_meal, long ms_death)
 static int	check_dinner_status(t_monitor *waiter)
 {
 	struct timeval	last_meal;
-	int meals_required;
-	int	ans;
-	int	i;
+	int				meals_required;
+	int				ans;
+	int				i;
 
 	i = -1;
 	ans = 0;
@@ -57,7 +57,7 @@ static int	check_dinner_status(t_monitor *waiter)
 	while (++i < waiter->table->n_philo)
 	{
 		last_meal = to_time_value(&(waiter->seats[i]), MTX_TIME_IS);
- 		if (cronometer(last_meal, waiter->table->time_to_die))
+		if (cronometer(last_meal, waiter->table->time_to_die))
 		{
 			to_print_access(&(waiter->seats[i]), MTX_PRINT_DEATH);
 			return (0);

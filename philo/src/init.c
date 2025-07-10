@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 17:09:12 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 17:31:26 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:56:32 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 int	destroy_mutex(t_rules *table)
 {
 	int	i;
-	int ans;
+	int	ans;
 
 	ans = 0;
 	i = -1;
@@ -34,7 +34,7 @@ int	destroy_mutex(t_rules *table)
 	while (++i < table->n_forks)
 	{
 		if (table->forks && pthread_mutex_destroy(&(table->forks[i])) != 0)
-			ans += printf("Error: Unable to destroy fork mutex %d\n", i); 
+			ans += printf("Error: Unable to destroy fork mutex %d\n", i);
 		if (table->meals && pthread_mutex_destroy(&(table->meals[i])) != 0)
 			ans += printf("Error: Unable to destroy fork mutex %d\n", i);
 	}
@@ -95,10 +95,10 @@ int	initialize_mutex(t_rules *table)
  * @note Once the monitor is correctly created, it's rutine will start
  * the experiment.
  */
-static int create_monitor(t_rules *table, t_philosopher *seats)
+static int	create_monitor(t_rules *table, t_philosopher *seats)
 {
 	t_monitor	*waiter;
-	
+
 	waiter = malloc(sizeof(t_monitor));
 	if (!waiter)
 		return (forcend(table, seats, PH_MEM_AERR));
@@ -111,14 +111,14 @@ static int create_monitor(t_rules *table, t_philosopher *seats)
 	}
 	return (PH_SUCCESS);
 }
-	
+
 /**
  * Initializes all necesary threads to run the philosopher program.
  * The amount of threads created is n_philo + 1 for the monitor.
  * @param table A pointer to the main enviroment philosopher structure.
  * @return Returns 0 on success. In case of error, returns the value of it.
  */
-int	start_philosophical_experiment(t_rules *table, t_philosopher **seats)
+int	start_dinner(t_rules *table, t_philosopher **seats)
 {
 	int	i;
 

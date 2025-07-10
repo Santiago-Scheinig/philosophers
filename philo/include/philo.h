@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:52:48 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 18:33:12 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:56:15 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 /**
  * An enumeration list of errors codes used to identify the correct message.
  */
-typedef	enum e_philo_errno
+typedef enum e_philo_errno
 {
 	PH_SUCCESS = 0,		// Success
 	PH_ARG_CINV,		// Amount of arguments isn't valid
@@ -35,7 +35,7 @@ typedef	enum e_philo_errno
 	PH_MTX_IERR,		// Mutex initialization failed
 	PH_MTX_DERR,		// Mutex destruction failed
 	PH_MEM_AERR,		// Memory allocation failed
-	PH_THD_CERR			// Thread creation failed
+	PH_THD_CERR,		// Thread creation failed
 }	t_philo_errno;		// @param enum_format PH_*
 
 /**
@@ -46,33 +46,33 @@ typedef enum e_mtx_time
 {
 	MTX_TIME_IS	= 0,	// Returns timestamp depending on eating flag value
 	MTX_TIME_ISFULL,	// To modify the eating flag to 0
-	MTX_TIME_ISEATING	// To modify the eating flag to 1
+	MTX_TIME_ISEATING,	// To modify the eating flag to 1
 }	t_mtx_time;			// @param enum_format MTX_TIME_*
 
 /**
  * An enumeration list of flag codes to identify specific actions to perform
  * inside of a mutexed flag.
  */
-typedef	enum e_mtx_flag
+typedef enum e_mtx_flag
 {
 	MTX_FLAG_READ = 0,	// To read a mutexed variable
 	MTX_FLAG_ON,		// To set a mutexed flag to 1
 	MTX_FLAG_OFF,		// To set a mutexed flag to 0
 	MTX_FLAG_INC,		// To increment a mutexed flag by 1
-	MTX_FLAG_SUB		// To substract a muteed flag by 1
+	MTX_FLAG_SUB,		// To substract a muteed flag by 1
 }	t_mtx_flag;			// @param enum_format MTX_FLAG_*
 
 /**
  * An enumeration list of print codes to identify specific messages to print
  * on STDOUT filtered by a mutex.
  */
-typedef	enum e_mtx_print
+typedef enum e_mtx_print
 {
 	MTX_PRINT_FORK = 0,	// Prints "[ts_in_ms] [philo_id] has taken a fork."
 	MTX_PRINT_EAT,		// Prints "[ts_in_ms] [philo_id] is eating."
 	MTX_PRINT_SLEEP,	// Prints "[ts_in_ms] [philo_id] is sleeping."
 	MTX_PRINT_THINK,	// Prints "[ts_in_ms] [philo_id] is thinking."
-	MTX_PRINT_DEATH		// Prints "[ts_in_ms] [philo_id] died."
+	MTX_PRINT_DEATH,	// Prints "[ts_in_ms] [philo_id] died."
 }	t_mtx_print;		// @param enum_format MTX_PRINT_*
 
 /*--------------------------------------------------------------------------*/
@@ -148,9 +148,9 @@ typedef struct s_philosopher
  * @param table A pointer to the main T_RULES structure.
  * @param seats A pointer to the T_PHILOSOPHER structure array.
  */
-typedef	struct s_monitor
+typedef struct s_monitor
 {
-	t_rules 		*table;
+	t_rules			*table;
 	t_philosopher	*seats;
 }	t_monitor;
 
@@ -169,7 +169,7 @@ typedef	struct s_monitor
  * 
  * @param table The main enviroment philosopher structure.
  */
-int		initialize_mutex(t_rules *table);
+int				initialize_mutex(t_rules *table);
 
 /**
  * Destroys every mutex created to run the philosopher program.
@@ -178,7 +178,7 @@ int		initialize_mutex(t_rules *table);
  * printed on screen detailing the failed mutex, the program
  * then exits with forcend(4).
  */
-int		destroy_mutex(t_rules *table);
+int				destroy_mutex(t_rules *table);
 
 /**
  * Initializes all necesary threads to run the philosopher program.
@@ -186,7 +186,7 @@ int		destroy_mutex(t_rules *table);
  * @param table A pointer to the main enviroment philosopher structure.
  * @return A pointer to the allocated array of T_PHILOSOPHERS.
  */
-int			start_philosophical_experiment(t_rules *table, t_philosopher **seats);
+int				start_dinner(t_rules *table, t_philosopher **seats);
 
 /*--------------------------------------------------------------------------*/
 /*------------------------------ MUTEX_ACTIONS -----------------------------*/
@@ -200,7 +200,7 @@ int			start_philosophical_experiment(t_rules *table, t_philosopher **seats);
  * @param table A pointer to the main experiment structure.
  * @param action The action to perform into death_flag.
  */
-int			to_death_flag(t_rules *table, t_mtx_flag action);
+int				to_death_flag(t_rules *table, t_mtx_flag action);
 
 /**
  * Using the t_mtx_time enum, executes instructions on the last_meal timestamp
@@ -222,7 +222,7 @@ struct timeval	to_time_value(t_philosopher *seat, t_mtx_time action);
  * variable.
  * @param action The action to perfrom into meals_eaten
  */
-int			to_meals_value(t_philosopher *seat, t_mtx_flag action);
+int				to_meals_value(t_philosopher *seat, t_mtx_flag action);
 
 /**
  * Using the T_MTX_PRINT enum, prints a specific message on STDOUT linked to
@@ -231,17 +231,17 @@ int			to_meals_value(t_philosopher *seat, t_mtx_flag action);
  * @param seat A pointer to the T_PHILOSOPHER linked to the message.
  * @param action The action to perform into death_flag.
  */
-void		to_print_access(t_philosopher *seat, t_mtx_print action);
+void			to_print_access(t_philosopher *seat, t_mtx_print action);
 
 /*--------------------------------------------------------------------------*/
 /*---------------------------------- UTILS ---------------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void		*monitorize(void *arg);
+void			*monitorize(void *arg);
 
-void		*philo(void *arg);
+void			*philo(void *arg);
 
-int	cronometer(struct timeval last_meal, long ms_death);
+int				cronometer(struct timeval last_meal, long ms_death);
 
 /**
  * Finds the first number on a STRING with a decimal base.
@@ -252,7 +252,7 @@ int	cronometer(struct timeval last_meal, long ms_death);
  * amount of spaces and one sign; but the next character must 
  * be a digit, if not or str doesn't exists, returns 0.
  */
-int			ft_atoi(const char *nptr);
+int				ft_atoi(const char *nptr);
 
 /**
  * Philosopher failsafe, in case of error, frees all memory that could remain
@@ -260,6 +260,6 @@ int			ft_atoi(const char *nptr);
  * @param table A pointer to the main environment philosopher structure.
  * @param errmsg The error number which points to its error string.
  */
-int		forcend(t_rules *table, t_philosopher *chairs, int errmsg);
+int				forcend(t_rules *table, t_philosopher *chairs, int errmsg);
 
 #endif

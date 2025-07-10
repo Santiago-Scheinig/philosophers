@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 17:11:22 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 17:27:44 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:51:09 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
  */
 int	to_death_flag(t_rules *table, t_mtx_flag action)
 {
-	int val;
+	int	val;
 
 	val = -1;
 	pthread_mutex_lock(&(table->death_mutex));
@@ -125,7 +125,7 @@ static int	get_time_of_dinner(struct timeval start_time)
 	long			ms_start;
 	long			ms_tv;
 
-	gettimeofday(&tv, NULL);	
+	gettimeofday(&tv, NULL);
 	ms_tv = (tv.tv_sec * 1000L) + (tv.tv_usec / 1000);
 	ms_start = (start_time.tv_sec * 1000L) + (start_time.tv_usec / 1000);
 	return (ms_tv - ms_start);
