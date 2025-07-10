@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/25 17:09:12 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 20:47:20 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 17:31:26 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 /**
  * Destroys every mutex created to run the philosopher program.
  * @param table A pointer to the main enviroment philosopher structure.
+ * @return Returns 0 on success. In case of error, returns the value of it.
  * @note If any mutex destruction fails, an error message is
  * printed on screen detailing the failed mutex, the program
  * then exits with forcend(4).
@@ -58,6 +59,7 @@ int	destroy_mutex(t_rules *table)
  * 	- Forks mutex: Used to avoid data races with forks.
  * 
  * @param table A pointer to the main enviroment philosopher structure.
+ * @return Returns 0 on success. In case of error, returns the value of it.
  */
 int	initialize_mutex(t_rules *table)
 {
@@ -89,6 +91,7 @@ int	initialize_mutex(t_rules *table)
  * the program so it can proper run the experiment.
  * @param table A pointer to the main enviroment philosopher structure.
  * @param seats A pointer to the array of T_PHILOSOPHERS.
+ * @return Returns 0 on success. In case of error, returns the value of it.
  * @note Once the monitor is correctly created, it's rutine will start
  * the experiment.
  */
@@ -113,7 +116,7 @@ static int create_monitor(t_rules *table, t_philosopher *seats)
  * Initializes all necesary threads to run the philosopher program.
  * The amount of threads created is n_philo + 1 for the monitor.
  * @param table A pointer to the main enviroment philosopher structure.
- * @return A pointer to the allocated array of T_PHILOSOPHERS.
+ * @return Returns 0 on success. In case of error, returns the value of it.
  */
 int	start_philosophical_experiment(t_rules *table, t_philosopher **seats)
 {

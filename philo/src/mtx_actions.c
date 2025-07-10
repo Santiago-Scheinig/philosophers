@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 17:11:22 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 17:21:04 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 17:27:44 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
  * 
  * @param table A pointer to the main experiment structure.
  * @param action The action to perform into death_flag.
+ * @return The current value of deat_flag.
  */
 int	to_death_flag(t_rules *table, t_mtx_flag action)
 {
@@ -54,6 +55,7 @@ int	to_death_flag(t_rules *table, t_mtx_flag action)
  * @param seat A pointer to a T_PHILOSOPHER structure linked to the meals_eaten
  * variable.
  * @param action The action to perfrom into meals_eaten
+ * @return The current value of meals_eaten on seat.
  */
 int	to_meals_value(t_philosopher *seat, t_mtx_flag action)
 {
@@ -88,7 +90,9 @@ int	to_meals_value(t_philosopher *seat, t_mtx_flag action)
  * 
  * @param seat A pointer to a T_PHILOSOPHER structure linked to the last_meal
  * timestamp variable.
- * @param action The action to perfrom into meals_eaten
+ * @param action The action to perfrom into meals_eaten.
+ * @return If is_eating is true, returns the current timeval. Else, returns 
+ * the last meal timeval on seat.
  */
 struct timeval	to_time_value(t_philosopher *seat, t_mtx_time action)
 {
@@ -109,6 +113,12 @@ struct timeval	to_time_value(t_philosopher *seat, t_mtx_time action)
 	return (val);
 }
 
+/**
+ * Returns the current time of the dinner, using a start_time, in ms.
+ * 
+ * @param start_time The time in which the dinner started.
+ * @return The current time in ms. 
+*/
 static int	get_time_of_dinner(struct timeval start_time)
 {
 	struct timeval	tv;
@@ -139,20 +149,20 @@ void	to_print_access(t_philosopher *seat, t_mtx_print action)
 		if (action == MTX_PRINT_DEATH)
 		{
 			to_death_flag(seat->table, MTX_FLAG_ON);
-			printf("%010lims %i died.\n", ms_tv, seat->id);
+			printf("%06lims %i died.\n", ms_tv, seat->id);
 		}
 		else if (action == MTX_PRINT_EAT)
-			printf("%010lims %i is eating.\n", ms_tv, seat->id);
+			printf("%06lims %i is eating.\n", ms_tv, seat->id);
 		else if (action == MTX_PRINT_FORK)
 		{
-			printf("%010lims %i has taken a fork.\n", ms_tv, seat->id);
+			printf("%06lims %i has taken a fork.\n", ms_tv, seat->id);
 			if (seat->table->n_philo > 1)
-				printf("%010lims %i has taken a fork.\n", ms_tv, seat->id);
+				printf("%06lims %i has taken a fork.\n", ms_tv, seat->id);
 		}
 		else if (action == MTX_PRINT_SLEEP)
-			printf("%010lims %i is sleeping.\n", ms_tv, seat->id);
+			printf("%06lims %i is sleeping.\n", ms_tv, seat->id);
 		else if (action == MTX_PRINT_THINK)
-			printf("%010lims %i is thinking.\n", ms_tv, seat->id);
+			printf("%06lims %i is thinking.\n", ms_tv, seat->id);
 	}
 	pthread_mutex_unlock(&(seat->table->print_mutex));
 }

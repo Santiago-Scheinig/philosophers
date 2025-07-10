@@ -6,13 +6,18 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 20:28:51 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 18:45:44 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:01:54 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	grab_forks(t_philosopher *seat)
+/**
+ * Indicates the philosopher thread to grab forks using a mutex lock.
+ * 
+ * @param seat A pointer to the T_PHILOSOPHER thread structure.
+ */
+static void	grab_forks(t_philosopher *seat)
 {
 	int	ms_death;
 
@@ -31,7 +36,26 @@ void	grab_forks(t_philosopher *seat)
 	}
 }
 
-void	eating(t_philosopher *seat)
+/**
+ * Indicates the philosopher thread to start eating:
+ * 
+ * - Locks the forks it needs.
+ * 
+ * - Sets [is_eating] flag to 1.
+ * 
+ * - Executes an usleep equal to [time_to_eat].
+ * 
+ * - Increments the [meals_eaten] value by one.
+ * 
+ * - Unlocks the forks it used.
+ * 
+ * - Updates [last_meal_time].
+ * 
+ * @param seat A pointer to the T_PHILOSOPHER thread structure.
+ * @note If [n_philo] equals 1, then a specific execution is made, where
+ * the thread grabs just one fork and waits until [time_to_die].
+ */
+static void	eating(t_philosopher *seat)
 {
 	if (seat->table->n_philo == 1)
 	{
@@ -53,13 +77,49 @@ void	eating(t_philosopher *seat)
 	}
 }
 
+/**
+ * In case of odd [n_philosopher] amount, it verifies if the thread needs
+ * to eat or not. To do so, compares the current time agains the [last_meal]
+ * time, and verifies it against ([time_to_die] / 3).
+ * 
+ * @param seat A pointer to the T_PHILOSOPHER thread structure.
+ * @return Returns 0 if it's less than ([time_to_die] / 3). Else, returns 1.
+ */
+static int	is_hungry(t_philosopher *seat)
+{
+	struct timeval	tv;
+	struct timeval	last_meal;
+	int				ms_tv;
+	int				ms_last_meal;
+
+	gettimeofday(&tv, NULL);
+	ms_tv = (tv.tv_sec * 1000L) + (tv.tv_usec / 1000);
+	last_meal = to_time_value(seat, MTX_TIME_IS);
+	ms_last_meal = (last_meal.tv_sec * 1000L) + (last_meal.tv_usec / 1000);
+	if (ms_tv - ms_last_meal <= (seat->table->time_to_die / 3))
+		return (0);
+	return (1);
+}
+
+/**
+ * The philosopher thread routine.
+ * 
+ * - Sets the [last_meal_time] to [start_time].
+ * 
+ * - If odd, waits ([time_to_eat] / 2) to create eating waves.
+ * 
+ * - While [death_flag] is false: Thinks, eats and sleeps.
+ * 
+ * @param arg A pointer to the needed arguments of the routine. A pointer to
+ * the T_PHILOSOPHER structure in this case.
+ * @note If [n_philosopher] it's an odd amount, uses is_hungry() to set 
+ * priorities between waves.
+ */
 void	*philo(void *arg)
 {
 	t_philosopher	*seat;
-	int				ms_death;
 
 	seat = (t_philosopher *) arg;
-	ms_death = seat->table->time_to_die;
 	while (to_death_flag(seat->table, MTX_FLAG_READ) < 0)
 		usleep(100);
 	to_time_value(seat, MTX_TIME_ISFULL);
@@ -68,8 +128,9 @@ void	*philo(void *arg)
 	while (!to_death_flag(seat->table, MTX_FLAG_READ))
 	{
 		to_print_access(seat, MTX_PRINT_THINK);
-		if (!(seat->id % 2))
-			usleep(200);
+		if ((seat->table->n_philo % 2))
+			while (!is_hungry(seat))
+				usleep(100);
 		eating(seat);
 		to_print_access(seat, MTX_PRINT_SLEEP);
 		usleep((seat->table->time_to_sleep * 1000));

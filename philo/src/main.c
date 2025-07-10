@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/02 18:16:11 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 17:24:57 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
  * @param table A pointer to the main enviroment philosopher structure.
  * @param seats A pointer to the T_PHILOSOPHER structure array.
  * @param errmsg The error number which points to its error string.
+ * @return In case of error, the value of errmsg. Else, returns 0.
  */
 int	forcend(t_rules *table, t_philosopher *seats, int errmsg)
 {
@@ -49,6 +50,7 @@ int	forcend(t_rules *table, t_philosopher *seats, int errmsg)
  * @param argc The amount of main arguments.
  * @param argv An array of STRINGS with all the main arguments.
  * @param table A pointer to the main enviroment philosopher structure.
+ * @return Returns 0 on success. In case of error, returns the value of it.
  * @note An argument that starts with anything other than a number, is read
  * as 0.
  */

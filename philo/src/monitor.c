@@ -6,12 +6,19 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 17:16:20 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 16:34:35 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:01:49 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+/**
+ * Verifies and returns if the time passed since [last_meal] is greater
+ * than the [ms_death].
+ * @param last_meal The timeval the [last_meal].
+ * @param ms_death The amount of miliseconds before death ([time_to_die]).
+ * @return Returns 1 if [ms_death] time has passed. Else, returns 0.
+ */
 int	cronometer(struct timeval last_meal, long ms_death)
 {
 	struct timeval	day_time;
@@ -26,6 +33,15 @@ int	cronometer(struct timeval last_meal, long ms_death)
 	return (0);
 }
 
+/**
+ * Allows the monitor thread to repeatedly verify if any philosopher
+ * thread has died, or fullfilled their [meals_to_eat] value.
+ * 
+ * @param waiter A pointer to the T_MONITOR structure.
+ * @return Returns 0 if a thread died. Returns 1 if all the meals have been
+ * successfully eaten by every philosopher. Returns 2 if no thread died and
+ * there ain't a maximum amount of meals to be eaten.
+ */
 static int	check_dinner_status(t_monitor *waiter)
 {
 	struct timeval	last_meal;
@@ -50,10 +66,22 @@ static int	check_dinner_status(t_monitor *waiter)
 			ans++;
 	}
 	if (!ans && meals_required > 0)
-		return (0);
+		return (2);
 	return (1);
 }
 
+/**
+ * The monitor thread routine.
+ * 
+ * - Sets the [start_time] of the dinner to current time.
+ * 
+ * - Initializes the dinner by setting the [death_flag] to false.
+ * 
+ * @param arg A pointer to the needed arguments of the routine. A pointer to
+ * the T_MONITOR structure in this case.
+ * @note If [death_flag] becomes true, it joins every philosopher thread and
+ * frees it's own structure. 
+ */
 void	*monitorize(void *arg)
 {
 	t_monitor	*waiter;
