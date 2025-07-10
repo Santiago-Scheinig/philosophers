@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 19:17:29 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 20:55:13 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ typedef enum e_philo_errno
 	PH_SEM_IERR,		// Semaphore initialization failed
 	PH_SEM_DERR,		// Semaphore destruction failed
 	PH_MEM_AERR,		// Memory allocation failed
-	PH_THD_CERR,		// Thread creation failed
+	PH_MEM_NERR,		// Memory allocation of sem_name failed
 	PH_PCS_CERR,		// Proccess creation failed
 }	t_philo_errno;		// @param enum_format PH_*
 
@@ -87,13 +87,10 @@ typedef enum e_sem_print
  * Struct used to save the rules of the experiment.
  * 
  * @param n_philo The amount of philosophers that will seat on the table.
- * @param n_forks The amount of forks avalible on the table.
  * @param time_to_die The time limit a philosopher can be without eating.
  * @param time_to_eat The time it takes a philosopher to eat.
  * @param time_to_sleep The time it takes a philosopher to sleep.
  * @param meals_required The amount of meals each philosopher must eat.
- * @param start_time The starting time of the experiment.
- * @param death_flag Flag used to start and end the experiment.
  * @param monitor_id The pid of the forked proccess to the monitor.
  * @param sem_death A semaphore linked to death_flag.
  * @param sem_print A semaphore linked to printf.
@@ -103,17 +100,15 @@ typedef enum e_sem_print
 typedef struct s_rules
 {
 	int				n_philo;
-	int				n_forks;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				meals_required;
-	struct timeval	start_time;
-	int				death_flag;
-	pid_t			monitor_id;
+	pid_t			*pid_id;
 	sem_t			*sem_death;
 	sem_t			*sem_print;
 	sem_t			*sem_forks;
+	sem_t			*sem_start;
 	sem_t			**sem_meals;
 }	t_rules;
 
@@ -136,25 +131,14 @@ typedef struct s_rules
 typedef struct s_philosopher
 {
 	int				id;
-	int				meals_eaten;
 	int				is_eating;
+	int				meals_eaten;
+	struct timeval	start_time;
 	struct timeval	last_meal_time;
-	pid_t			pid_id;
+	char			*sem_name;
 	sem_t			*sem_meal;
 	t_rules			*table;
 }	t_philosopher;
-
-/**
- * Struct used to save all the information of the experiment as a whole.
- * 
- * @param table A pointer to the main T_RULES structure.
- * @param seats A pointer to the T_PHILOSOPHER structure array.
- */
-typedef	struct s_monitor
-{
-	t_rules 		*table;
-	t_philosopher	*seats;
-}	t_monitor;
 
 /*--------------------------------------------------------------------------*/
 /*----------------------------- INITIALIZATION -----------------------------*/
@@ -188,7 +172,7 @@ int	sem_close(t_rules *table);
  * @param table A pointer to the main enviroment philosopher structure.
  * @return A pointer to the allocated array of T_PHILOSOPHERS.
  */
-int			start_philosophical_experiment(t_rules *table, t_philosopher **seats);
+int			start_dinner(t_rules *table);
 
 /*--------------------------------------------------------------------------*/
 /*------------------------------ MUTEX_ACTIONS -----------------------------*/
