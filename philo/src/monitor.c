@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/02 17:16:20 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 18:55:42 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 16:34:35 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ static int	check_dinner_status(t_monitor *waiter)
 	i = -1;
 	ans = 0;
 	meals_required = waiter->table->meals_required;
+	if (waiter->table->n_philo == 1)
+		usleep(waiter->table->time_to_die * 1000);
 	while (++i < waiter->table->n_philo)
 	{
 		last_meal = to_time_value(&(waiter->seats[i]), MTX_TIME_IS);
