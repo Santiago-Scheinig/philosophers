@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:52:48 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 19:00:43 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 19:14:06 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,11 +118,14 @@ typedef struct s_rules
  * 
  * @param id The identification number of the philosopher.
  * @param meals_eaten The amount of meals the philosopher had eaten.
+ * @param is_eating A flag to follow if the philosopher is eating or not.
  * @param last_meal_time The time the philosopher finished its last meal.
- * @param thead_id The identification thread of the philosopher.
+ * @param thd_id The identification thread of the philosopher.
  * @param left_fork A pointer to a fork mutex to the left of the philosopher.  
  * @param right_fork A pointer to a fork mutex to the right of the philosopher.
- * @param rules A pointer to the experiment main T_RULES structure.
+ * @param meal_mutex A pointer to a meal mutex linked to [meals_eaten] and 
+ * [last_meal_time].
+ * @param table A pointer to the experiment main T_RULES structure.
  * 
  * @warning No philosopher should be allowed to WRITE on the main T_RULES
  * structure, only READ, doing so leads to undifined behaivor and data races.

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_bonus.h                                      :+:      :+:    :+:   */
+/*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:46:54 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 19:17:29 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@
 /**
  * An enumeration list of errors codes used to identify the correct message.
  */
-typedef	enum e_philo_errno
+typedef enum e_philo_errno
 {
 	PH_SUCCESS = 0,		// Success
 	PH_ARG_CINV,		// Amount of arguments isn't valid
@@ -39,7 +39,7 @@ typedef	enum e_philo_errno
 	PH_SEM_DERR,		// Semaphore destruction failed
 	PH_MEM_AERR,		// Memory allocation failed
 	PH_THD_CERR,		// Thread creation failed
-	PH_PCS_CERR			// Proccess creation failed
+	PH_PCS_CERR,		// Proccess creation failed
 }	t_philo_errno;		// @param enum_format PH_*
 
 /**
@@ -50,33 +50,33 @@ typedef enum e_sem_time
 {
 	SEM_TIME_IS	= 0,	// Returns timestamp depending on eating flag value
 	SEM_TIME_ISFULL,	// To modify the eating flag to 0
-	SEM_TIME_ISEATING	// To modify the eating flag to 1
+	SEM_TIME_ISEATING,	// To modify the eating flag to 1
 }	t_sem_time;			// @param enum_format SEM_TIME_*
 
 /**
  * An enumeration list of flag codes to identify specific actions to perform
  * inside of a mutexed flag.
  */
-typedef	enum e_sem_flag
+typedef enum e_sem_flag
 {
 	SEM_FLAG_READ = 0,	// To read a semaphore protected variable
 	SEM_FLAG_ON,		// To set a semaphore protected flag to 1
 	SEM_FLAG_OFF,		// To set a semaphore protected flag to 0
 	SEM_FLAG_INC,		// To increment a semaphore protected flag by 1
-	SEM_FLAG_SUB		// To substract a semaphore protected flag by 1
+	SEM_FLAG_SUB,		// To substract a semaphore protected flag by 1
 }	t_sem_flag;			// @param enum_format SEM_FLAG_*
 
 /**
  * An enumeration list of print codes to identify specific messages to print
  * on STDOUT filtered by a mutex.
  */
-typedef	enum e_sem_print
+typedef enum e_sem_print
 {
 	SEM_PRINT_FORK = 0,	// Prints "[ts_in_ms] [philo_id] has taken a fork."
 	SEM_PRINT_EAT,		// Prints "[ts_in_ms] [philo_id] is eating."
 	SEM_PRINT_SLEEP,	// Prints "[ts_in_ms] [philo_id] is sleeping."
 	SEM_PRINT_THINK,	// Prints "[ts_in_ms] [philo_id] is thinking."
-	SEM_PRINT_DEATH		// Prints "[ts_in_ms] [philo_id] died."
+	SEM_PRINT_DEATH,	// Prints "[ts_in_ms] [philo_id] died."
 }	t_sem_print;		// @param enum_format SEM_PRINT_*
 
 /*--------------------------------------------------------------------------*/
@@ -97,7 +97,7 @@ typedef	enum e_sem_print
  * @param monitor_id The pid of the forked proccess to the monitor.
  * @param sem_death A semaphore linked to death_flag.
  * @param sem_print A semaphore linked to printf.
- * @param forks A pointer to a PTHREAD_T ARRAY to the forks in table order.
+ * @param sem_forks A pointer to a PTHREAD_T ARRAY to the forks in table order.
  * @param sem_meals A pointer to a SEM_T ARRAY to protect timestamps of meals.
  */
 typedef struct s_rules
@@ -114,7 +114,7 @@ typedef struct s_rules
 	sem_t			*sem_death;
 	sem_t			*sem_print;
 	sem_t			*sem_forks;
-	sem_t			**sem_meals;	//double cuz is one semaphore per philosopher 
+	sem_t			**sem_meals;
 }	t_rules;
 
 /**
@@ -122,11 +122,11 @@ typedef struct s_rules
  * 
  * @param id The identification number of the philosopher.
  * @param meals_eaten The amount of meals the philosopher had eaten.
+ * @param is_eating A flag to follow if the philosopher is eating or not.
  * @param last_meal_time The time the philosopher finished its last meal.
- * @param thead_id The identification thread of the philosopher.
- * @param left_fork A pointer to a fork mutex to the left of the philosopher.  
- * @param right_fork A pointer to a fork mutex to the right of the philosopher.
- * @param rules A pointer to the experiment main T_RULES structure.
+ * @param pid_id The identification pid of the philosopher process.
+ * @param sem_meal A pointer to a mutex linked to all meal interactions.
+ * @param table A pointer to the experiment main T_RULES structure.
  * 
  * @warning No philosopher should be allowed to WRITE on the main T_RULES
  * structure, only READ, doing so leads to undifined behaivor and data races.
