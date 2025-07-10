@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 20:49:39 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:46:54 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,12 +111,10 @@ typedef struct s_rules
 	struct timeval	start_time;
 	int				death_flag;
 	pid_t			monitor_id;
-	char			*sem_name;
 	sem_t			*sem_death;
 	sem_t			*sem_print;
 	sem_t			*sem_forks;
 	sem_t			**sem_meals;	//double cuz is one semaphore per philosopher 
-									//can i unlink it? and then kill it?
 }	t_rules;
 
 /**
@@ -182,7 +180,7 @@ int	initialize_semaphore(t_rules *table)
  * printed on screen detailing the failed mutex, the program
  * then exits with forcend(4).
  */
-int		destroy_mutex(t_rules *table);
+int	sem_close(t_rules *table);
 
 /**
  * Initializes all necesary threads to run the philosopher program.

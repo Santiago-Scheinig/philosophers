@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main_bonus.c                                       :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/08 20:49:52 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/10 18:46:30 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,8 @@ int	forcend(t_rules *table, t_philosopher *seats, int errmsg)
 	if (seats)
 		free(seats);
 	if (table)
-		if (&(table->forks) || &(table->meals))
-			return (destroy_mutex(table));
+		if (&(table->sem_forks) || &(table->sem_meals))
+			return (close_semaphores(table));
 	if (errmsg)
 		printf("Error: %s\n", msg[errmsg]);
 	return (errmsg);
@@ -50,6 +50,7 @@ int	forcend(t_rules *table, t_philosopher *seats, int errmsg)
  * @param argc The amount of main arguments.
  * @param argv An array of STRINGS with all the main arguments.
  * @param table A pointer to the main enviroment philosopher structure.
+ * @return Returns 0 on success. In case of error, returns the value of it.
  * @note An argument that starts with anything other than a number, is read
  * as 0.
  */
@@ -82,7 +83,6 @@ static int	check_args(int argc, char **argv, t_rules *table)
 
 int	main(int argc, char **argv)
 {
-	char			sem_name[200];
 	int				i;
 	t_rules			table;
 	t_philosopher	*seats;
@@ -90,8 +90,6 @@ int	main(int argc, char **argv)
 	if (check_args(argc, argv, &table))
 		return (1);
 	i = -1;
-	while (++i < table.n_philo)
-		sem_name[i] == /*build_sem_name()*/;
 	if (initialize_semaphore(&table))
 		return (1);
 	if (start_philosophical_experiment(&table, &seats))
