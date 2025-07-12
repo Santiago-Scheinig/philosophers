@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 15:23:49 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 16:36:23 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 16:44:58 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,16 @@ static char	*get_sem_name(char *name, int name_len, int id)
 	return (name);
 }
 
+/**
+ * Initializes all necessary STRINGS to initialize philosophers semaphores.
+ * 
+ * The base of the semaphore name is "/philo_[id]". Reserving the [id] = 0
+ * for the monitor semaphore.
+ * 
+ * @param table A pointer to the main enviroment philosopher structure.
+ * 
+ * @note The id corresponding each philosopher proccess is inverted.
+ */
 void	initialize_sem_names(t_rules *table)
 {
 	const char	*base_name = "/philo_";
@@ -51,6 +61,15 @@ void	initialize_sem_names(t_rules *table)
 	}
 }
 
+/**
+ * Unlinks every semaphore created to run the philosopher program.
+ * 
+ * @param table A pointer to the main enviroment philosopher structure.
+ * 
+ * @note If any semaphore unlink fails, an error message is
+ * printed on screen detailing the failed semaphore, the program
+ * then exits with forcend(4).
+ */
 void	unlink_semaphores(t_rules *table)
 {
 	char	*name;
@@ -79,10 +98,12 @@ void	unlink_semaphores(t_rules *table)
 
 /**
  * Close every semaphore created to run the philosopher program.
+ * 
  * @param table A pointer to the main enviroment philosopher structure.
+ * 
  * @note If any semaphore close fails, an error message is
  * printed on screen detailing the failed semaphore, the program
- * then exits with forcend(4).
+ * then exits with forcend(5).
  */
 void	close_semaphores(t_rules *table)
 {
@@ -114,11 +135,11 @@ void	close_semaphores(t_rules *table)
 /**
  * Initializes all necessary semaphores to run the philosopher program.
  * 
- * 	- Death semaphore: Used to avoid data races with the death flag.
+ * 	- Death semaphore: Used to follow-up proccesses death.
  *
- * 	- Print semaphore: Used to avoid data races with the print flag.
+ * 	- Print semaphore: Used to avoid write interleaving between proccesses.
  * 
- * 	- Forks semaphore: Used to follow remaining forks.
+ * 	- Forks semaphore: Used to follow-up remaining forks.
  * 
  *	- Start semaphore: Used to link the start of philosopher proccesses.
  * 

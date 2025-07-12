@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 16:36:58 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 17:30:46 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ void	split_free(char **split)
 
 /**
  * Philosopher failsafe, in case of error, frees all memory that could remain
- * allocated in the main structure, and destroy any created mutex.
+ * allocated in the main structure, and closes/unlinks any created semaphore.
+ * 
  * @param table A pointer to the main enviroment philosopher structure.
- * @param seats A pointer to the T_PHILOSOPHER structure array.
  * @param errmsg The error number which points to its error string.
  */
 void	forcend(t_rules *table, int errmsg)
@@ -38,12 +38,11 @@ void	forcend(t_rules *table, int errmsg)
 		"Semaphore initialization failed",
 		"Semaphore unlink failed",
 		"Semaphore destruction failed",
-		"Memory allocation failed",
 		"Thread creation failed",
-		"Proccess creation failed"
+		"Proccess creation failed",
+		"Waitpid of child proccess failed",
+		"Memory allocation failed",
 	};
-/* 	if (errmsg == msg of monitor failure)
-		//kill and waitfor all the avalible pids */
 	if (table)
 	{
 		if (table->sem_philo)
@@ -52,7 +51,10 @@ void	forcend(t_rules *table, int errmsg)
 			unlink_semaphores(table);
 		}
 	}
-	split_free(table->sem_names);
+	if (table->pid_id)
+		free(table->pid_id);
+	if (table->sem_names)
+		split_free(table->sem_names);
 	if (errmsg)
 		printf("Error: %s\n", msg[errmsg]);
 	exit(errmsg);
@@ -61,9 +63,11 @@ void	forcend(t_rules *table, int errmsg)
 /**
  * Verifies user input and initializes the main enviroment structure with
  * all its data.
+ * 
  * If either "n_philo" or "time_to_die" are 0, or if any other input 
  * number is negative, then the program exits with forcend(2). If the amount
  * of arguments isn't valid, the program exits with forcend(1).
+ * 
  * @param argc The amount of main arguments.
  * @param argv An array of STRINGS with all the main arguments.
  * @param table A pointer to the main enviroment philosopher structure.
@@ -97,7 +101,8 @@ static void	check_args(int argc, char **argv, t_rules *table)
 
 int	main(int argc, char **argv)
 {
-	t_rules			table;
+	t_rules	table;
+	int		i;
 
 	check_args(argc, argv, &table);
 	initialize_sem_names(&table);
@@ -105,14 +110,9 @@ int	main(int argc, char **argv)
 	if (!table.sem_philo)
 		forcend(&table, PH_MEM_AERR);
 	initialize_semaphores(&table);
+	initialize_dinner(&table);
+	i = -1;
+	while (++i < table.n_philo)
+		sem_post(table.sem_start);
 	forcend(&table, PH_SUCCESS);
-/* 	
-	initialize_semaphore(&table, table.n_philo);
-	table.pid_id = malloc((table.n_philo + 2) * sizeof(pid_t));
-	if (!table.pid_id)
-		forcend(table, NULL, PH_MEM_AERR);
-	memset(&(table.pid_id), 0, table.n_philo + 2);
-	table.pid_id[table.n_philo + 1] = -1;
-	start_dinner(&table);
-	forcend(&table, PH_SUCCESS); */
 }

@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 16:34:50 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 17:26:21 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,10 @@ typedef enum e_philo_errno
 	PH_SEM_IERR,		// Semaphore initialization failed
 	PH_SEM_UERR,		// Semaphore unlink failed
 	PH_SEM_DERR,		// Semaphore destruction failed
-	PH_MEM_AERR,		// Memory allocation failed
-	PH_MEM_NERR,		// Memory allocation of sem_name failed
+	PH_THD_CERR,		// Thread creation failed
 	PH_PCS_CERR,		// Proccess creation failed
+	PH_PID_WERR,		// Waitpid for proccess failed
+	PH_MEM_AERR,		// Memory allocation failed
 }	t_philo_errno;		// @param enum_format PH_*
 
 /**
@@ -179,7 +180,7 @@ void	initialize_sem_names(t_rules *table);
  * @param table A pointer to the main enviroment philosopher structure.
  * @return A pointer to the allocated array of T_PHILOSOPHERS.
  */
-int			start_dinner(t_rules *table);
+int		initialize_dinner(t_rules *table);
 
 /*--------------------------------------------------------------------------*/
 /*------------------------------ MUTEX_ACTIONS -----------------------------*/

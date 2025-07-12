@@ -1,26 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   routines.c                                         :+:      :+:    :+:   */
+/*   philosopher_proccess.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/12 17:34:46 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 17:36:00 by sscheini         ###   ########.fr       */
+/*   Created: 2025/07/12 17:49:01 by sscheini          #+#    #+#             */
+/*   Updated: 2025/07/12 18:05:06 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void	monitor_death(void *arg)
-{
-	//CAREFUL WITH DOUBLE KILLS (DO I NEED ANOTHER SEMAPHORE???!);
-}
+#include "philo_sem.h"
 
-void	monitor_meals(void *arg)
+void	philosophize(t_rules *table, t_philo *seat)
 {
-	//CAREFUL WITH DOUBLE KILLS (DO I NEED ANOTHER SEMAPHORE???!);
-}
-
-void	philo_death(void *arg)
-{
-	//Constantly checks if a philosopher died
+	//create the philo_death thread
+	//signal sem_post(ready)
+	//sem_wait(start) waiting for the main to start the dinner
+	//philosopher proccess to think, eat and sleep until death or meals_to_eat
 }
