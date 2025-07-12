@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 20:28:51 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:01:54 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 12:33:17 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,12 +128,12 @@ void	*philo(void *arg)
 	while (!to_death_flag(seat->table, MTX_FLAG_READ))
 	{
 		to_print_access(seat, MTX_PRINT_THINK);
-		if ((seat->table->n_philo % 2))
-			while (!is_hungry(seat))
-				usleep(100);
 		eating(seat);
 		to_print_access(seat, MTX_PRINT_SLEEP);
 		usleep((seat->table->time_to_sleep * 1000));
+		if ((seat->table->n_philo % 2))
+			while (!is_hungry(seat))
+				usleep(100);
 	}
 	return (NULL);
 }
