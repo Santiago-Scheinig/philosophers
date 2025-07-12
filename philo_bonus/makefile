@@ -4,11 +4,12 @@
 NAME		=	philo_bonus
 
 # The name list for regular and bonus source files.							#
-SRC			=	$(SRC_DIR)/ft_atoi.c		\
-				$(SRC_DIR)/init.c			\
-				$(SRC_DIR)/sem_actions.c	\
-				$(SRC_DIR)/routines.c		\
-				$(SRC_DIR)/philo.c			
+SRC			=	$(SRC_DIR)/ft_atoi.c			\
+				$(SRC_DIR)/dinner_init.c		\
+				$(SRC_DIR)/semaphores_init.c	\
+				$(SRC_DIR)/semaphores_actions.c	\
+				$(SRC_DIR)/routines.c			\
+				$(SRC_DIR)/philo.c
 SRC_BON		=
 
 # The flags used to compile the objects.									#

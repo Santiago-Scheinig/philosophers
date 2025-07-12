@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 12:37:37 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 16:03:08 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define PHILO_SEM_H
 
 # include <sys/time.h>
+# include <sys/wait.h>
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <stdio.h>
@@ -36,6 +37,7 @@ typedef enum e_philo_errno
 	PH_ARG_CINV,		// Amount of arguments isn't valid
 	PH_ARG_VINV,		// Arguments aren't valid
 	PH_SEM_IERR,		// Semaphore initialization failed
+	PH_SEM_UERR,		// Semaphore unlink failed
 	PH_SEM_DERR,		// Semaphore destruction failed
 	PH_MEM_AERR,		// Memory allocation failed
 	PH_MEM_NERR,		// Memory allocation of sem_name failed
@@ -110,6 +112,7 @@ typedef struct s_rules
 	sem_t			*sem_forks;
 	sem_t			*sem_start;
 	sem_t			**sem_meals;
+	char			**sem_philo;
 }	t_rules;
 
 /**
@@ -155,7 +158,7 @@ typedef struct s_philosopher
  * 
  * @param table A pointer to the main enviroment philosopher structure.
  */
-int	initialize_semaphore(t_rules *table)
+void	initialize_semaphores(t_rules *table);
 
 /**
  * Destroys every mutex created to run the philosopher program.
@@ -164,7 +167,11 @@ int	initialize_semaphore(t_rules *table)
  * printed on screen detailing the failed mutex, the program
  * then exits with forcend(4).
  */
-int	sem_close(t_rules *table);
+void	close_semaphores(t_rules *table);
+
+void	unlink_semaphores(t_rules *table);
+
+void	initialize_sem_names(t_rules *table);
 
 /**
  * Initializes all necesary threads to run the philosopher program.
@@ -186,7 +193,7 @@ int			start_dinner(t_rules *table);
  * @param table A pointer to the main experiment structure.
  * @param action The action to perform into death_flag.
  */
-int			to_death_flag(t_rules *table, t_mtx_flag action);
+int			to_death_flag(t_rules *table, t_sem_flag action);
 
 /**
  * Using the t_mtx_time enum, executes instructions on the last_meal timestamp
@@ -197,7 +204,7 @@ int			to_death_flag(t_rules *table, t_mtx_flag action);
  * timestamp variable.
  * @param action The action to perfrom into meals_eaten
  */
-struct timeval	to_time_value(t_philosopher *seat, t_mtx_time action);
+struct timeval	to_time_value(t_philosopher *seat, t_sem_time action);
 
 /**
  * Using the t_mtx_flag enum, executes instructions on the meals_eaten
@@ -208,7 +215,7 @@ struct timeval	to_time_value(t_philosopher *seat, t_mtx_time action);
  * variable.
  * @param action The action to perfrom into meals_eaten
  */
-int			to_meals_value(t_philosopher *seat, t_mtx_flag action);
+int			to_meals_value(t_philosopher *seat, t_sem_flag action);
 
 /**
  * Using the T_MTX_PRINT enum, prints a specific message on STDOUT linked to
@@ -217,7 +224,7 @@ int			to_meals_value(t_philosopher *seat, t_mtx_flag action);
  * @param seat A pointer to the T_PHILOSOPHER linked to the message.
  * @param action The action to perform into death_flag.
  */
-void		to_print_access(t_philosopher *seat, t_mtx_print action);
+void		to_print_access(t_philosopher *seat, t_sem_print action);
 
 /*--------------------------------------------------------------------------*/
 /*---------------------------------- UTILS ---------------------------------*/
@@ -246,6 +253,6 @@ int			ft_atoi(const char *nptr);
  * @param table A pointer to the main environment philosopher structure.
  * @param errmsg The error number which points to its error string.
  */
-int		forcend(t_rules *table, t_philosopher *chairs, int errmsg);
+void	forcend(t_rules *table, int errmsg);
 
 #endif

@@ -6,11 +6,21 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 12:43:04 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 16:29:47 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_sem.h"
+
+void	split_free(char **split)
+{
+	int	i;
+
+	i = -1;
+	while (split[++i])
+		free(split[i]);
+	free(split);	
+}
 
 /**
  * Philosopher failsafe, in case of error, frees all memory that could remain
@@ -26,18 +36,23 @@ void	forcend(t_rules *table, int errmsg)
 		"Invalid amount of arguments",
 		"Invalid arguments",
 		"Semaphore initialization failed",
+		"Semaphore unlink failed",
 		"Semaphore destruction failed",
 		"Memory allocation failed",
 		"Thread creation failed",
 		"Proccess creation failed"
 	};
-	if (errmsg == /*msg of monitor failure*/)
-		//kill and waitfor all the avalible pids
-	if (table && errmsg != PH_MEM_NERR)
-		if (&(table->sem_forks) || &(table->sem_meals))
+/* 	if (errmsg == msg of monitor failure)
+		//kill and waitfor all the avalible pids */
+	if (table)
+	{
+		if (table->sem_meals)
+		{
 			close_semaphores(table);
-	if (errmsg == PH_MEM_NERR)
-		errmsg = PH_MEM_AERR;
+			unlink_semaphores(table);
+		}
+	}
+	split_free(table->sem_philo);
 	if (errmsg)
 		printf("Error: %s\n", msg[errmsg]);
 	exit(errmsg);
@@ -63,7 +78,6 @@ static void	check_args(int argc, char **argv, t_rules *table)
 		return (forcend(NULL, PH_ARG_CINV));
 	i = 0;
 	memset(table, 0, sizeof(t_rules));
-	table->death_flag = -1;
 	table->n_philo = ft_atoi(argv[++i]);
 	if (table->n_philo <= 0)
 		forcend(NULL, PH_ARG_VINV);
@@ -86,9 +100,13 @@ int	main(int argc, char **argv)
 	t_rules			table;
 
 	check_args(argc, argv, &table);
-	table.sem_meals = malloc(sizeof(sem_t) * table->n_philo);
+	initialize_sem_names(&table);
+	table.sem_meals = malloc(sizeof(sem_t) * table.n_philo);
 	if (!table.sem_meals)
-		forcend(table, NULL, PH_MEM_AERR);
+		forcend(&table, PH_MEM_AERR);
+	initialize_semaphores(&table);
+	forcend(&table, PH_SUCCESS);
+/* 	
 	initialize_semaphore(&table, table.n_philo);
 	table.pid_id = malloc((table.n_philo + 2) * sizeof(pid_t));
 	if (!table.pid_id)
@@ -96,5 +114,5 @@ int	main(int argc, char **argv)
 	memset(&(table.pid_id), 0, table.n_philo + 2);
 	table.pid_id[table.n_philo + 1] = -1;
 	start_dinner(&table);
-	forcend(&table, PH_SUCCESS);
+	forcend(&table, PH_SUCCESS); */
 }
