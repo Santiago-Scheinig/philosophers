@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 16:29:47 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 16:36:58 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,13 @@ void	forcend(t_rules *table, int errmsg)
 		//kill and waitfor all the avalible pids */
 	if (table)
 	{
-		if (table->sem_meals)
+		if (table->sem_philo)
 		{
 			close_semaphores(table);
 			unlink_semaphores(table);
 		}
 	}
-	split_free(table->sem_philo);
+	split_free(table->sem_names);
 	if (errmsg)
 		printf("Error: %s\n", msg[errmsg]);
 	exit(errmsg);
@@ -101,8 +101,8 @@ int	main(int argc, char **argv)
 
 	check_args(argc, argv, &table);
 	initialize_sem_names(&table);
-	table.sem_meals = malloc(sizeof(sem_t) * table.n_philo);
-	if (!table.sem_meals)
+	table.sem_philo = malloc(sizeof(sem_t) * table.n_philo);
+	if (!table.sem_philo)
 		forcend(&table, PH_MEM_AERR);
 	initialize_semaphores(&table);
 	forcend(&table, PH_SUCCESS);

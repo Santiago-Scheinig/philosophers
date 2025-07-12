@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 16:03:08 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 16:34:50 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,8 +111,8 @@ typedef struct s_rules
 	sem_t			*sem_print;
 	sem_t			*sem_forks;
 	sem_t			*sem_start;
-	sem_t			**sem_meals;
-	char			**sem_philo;
+	sem_t			**sem_philo;
+	char			**sem_names;
 }	t_rules;
 
 /**

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sem_init.c                                         :+:      :+:    :+:   */
+/*   semaphores_init.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 15:23:49 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 16:27:05 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 16:36:23 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,24 +30,24 @@ void	initialize_sem_names(t_rules *table)
 	static int	i = -1;
 	int			j;
 
-	table->sem_philo = malloc((table->n_philo + 2) * sizeof(char *));
-	if (!table->sem_philo)
+	table->sem_names = malloc((table->n_philo + 2) * sizeof(char *));
+	if (!table->sem_names)
 		forcend(table, PH_MEM_AERR);
-	table->sem_philo[table->n_philo + 1] = NULL;
+	table->sem_names[table->n_philo + 1] = NULL;
 	while(++i < table->n_philo + 1)
 	{
 		j = -1;
-		table->sem_philo[i] = malloc(20 * sizeof(char));
-		if (!table->sem_philo[i])
+		table->sem_names[i] = malloc(20 * sizeof(char));
+		if (!table->sem_names[i])
 		{
 			while (--i >= 0)
-				free(table->sem_philo[i]);
+				free(table->sem_names[i]);
 			forcend(table, PH_MEM_AERR);
 		}
-		memset(table->sem_philo[i], 0, (20 * sizeof(char)));
+		memset(table->sem_names[i], 0, (20 * sizeof(char)));
 		while (base_name[++j])
-			table->sem_philo[i][j] = base_name[j];
-		table->sem_philo[i] = get_sem_name(table->sem_philo[i], 7, i);
+			table->sem_names[i][j] = base_name[j];
+		table->sem_names[i] = get_sem_name(table->sem_names[i], 7, i);
 	}
 }
 
@@ -69,7 +69,7 @@ void	unlink_semaphores(t_rules *table)
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
-		name = table->sem_philo[i];
+		name = table->sem_names[i];
 		if (sem_unlink(name))
 			ans += printf("Error: Unable to unlink semaphore /philo_%d\n", i);
 	}
@@ -100,12 +100,12 @@ void	close_semaphores(t_rules *table)
 		ans += printf("Error: Unable to close /start semaphore\n");
 	i = -1;
 	while (++i < table->n_philo + 1)
-		if (sem_close(table->sem_meals[i]))
+		if (sem_close(table->sem_philo[i]))
 			ans += printf("Error: Unable to close semaphore /philo_%d\n", i);
-	if (table->sem_meals)
+	if (table->sem_philo)
 	{
-		free(table->sem_meals);
-		table->sem_meals = NULL;
+		free(table->sem_philo);
+		table->sem_philo = NULL;
 	}
 	if (ans)
 		forcend(table, PH_SEM_DERR);
@@ -120,7 +120,9 @@ void	close_semaphores(t_rules *table)
  * 
  * 	- Forks semaphore: Used to follow remaining forks.
  * 
- *	- Meals semaphore: Used to avoid data races with the meals flag.
+ *	- Start semaphore: Used to link the start of philosopher proccesses.
+ * 
+ *	- Philo semaphore: Used to avoid data races with philosopher threads.
  * 
  * @param table A pointer to the main enviroment philosopher structure.
  */
@@ -146,9 +148,9 @@ void	initialize_semaphores(t_rules *table)
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
-		name = table->sem_philo[i];
-		table->sem_meals[i] = sem_open(name, O_CREAT | O_EXCL, 0644, 1);
-		if (table->sem_meals[i] == SEM_FAILED)
+		name = table->sem_names[i];
+		table->sem_philo[i] = sem_open(name, O_CREAT | O_EXCL, 0644, 1);
+		if (table->sem_philo[i] == SEM_FAILED)
 			forcend(table, PH_SEM_IERR);
 	}
 }
