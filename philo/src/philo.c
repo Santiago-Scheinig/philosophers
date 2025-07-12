@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 20:28:51 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 12:33:17 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 13:29:24 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ static void	eating(t_philosopher *seat)
 		pthread_mutex_lock(seat->left_fork);
 		to_print_access(seat, MTX_PRINT_FORK);
 		pthread_mutex_unlock(seat->left_fork);
-		usleep(seat->table->time_to_die * 2000);
+		usleep(seat->table->time_to_die * 1100);
 	}
 	else
 	{
@@ -96,7 +96,7 @@ static int	is_hungry(t_philosopher *seat)
 	ms_tv = (tv.tv_sec * 1000L) + (tv.tv_usec / 1000);
 	last_meal = to_time_value(seat, MTX_TIME_IS);
 	ms_last_meal = (last_meal.tv_sec * 1000L) + (last_meal.tv_usec / 1000);
-	if (ms_tv - ms_last_meal <= (seat->table->time_to_die / 3))
+	if (ms_tv - ms_last_meal <= (seat->table->time_to_die / 2))
 		return (0);
 	return (1);
 }
@@ -123,12 +123,14 @@ void	*philo(void *arg)
 	while (to_death_flag(seat->table, MTX_FLAG_READ) < 0)
 		usleep(100);
 	to_time_value(seat, MTX_TIME_ISFULL);
-	if ((seat->id % 2) != 0)
+	if ((seat->id % 2) != 0 && seat->table->n_philo != 1)
 		usleep((seat->table->time_to_eat / 2) * 1000);
 	while (!to_death_flag(seat->table, MTX_FLAG_READ))
 	{
 		to_print_access(seat, MTX_PRINT_THINK);
 		eating(seat);
+		if (to_death_flag(seat->table, MTX_FLAG_READ))
+			return (NULL);
 		to_print_access(seat, MTX_PRINT_SLEEP);
 		usleep((seat->table->time_to_sleep * 1000));
 		if ((seat->table->n_philo % 2))

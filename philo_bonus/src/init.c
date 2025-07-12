@@ -6,11 +6,11 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 19:36:30 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 21:02:15 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 12:42:38 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_sem.h"
 
 
 char	*sem_name(int nbr)
@@ -121,17 +121,16 @@ void	initialize_semaphore(t_rules *table, int n_philo)
 static void	create_monitor(t_rules *table)
 {
 	table->pid_id[0] = fork();
-	if (pid < 0)
-		forcend(table, seats, PH_THD_CERR); //forcend should kill and wait for philo.
+	if (table->pid_id[0] < 0)
+		forcend(table, seats, PH_PCS_CERR); //forcend should kill and wait for philo.
 	if (!pid)
 	{
 		//create thread that blocks itself in sem_death
 		//create thread that verifies meals_eaten
-		//sem_wait(sem_death) - that way it wont start the waitpid loop until end of dinner.
+		//loop to start the dinner
 		//waitpid for all philosopher proccess
 		//exit self
 	}
-	//loop to start the dinner
 }
 	
 /**

@@ -6,11 +6,11 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 21:03:24 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/12 12:43:04 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.h"
+#include "philo_sem.h"
 
 /**
  * Philosopher failsafe, in case of error, frees all memory that could remain
@@ -90,9 +90,11 @@ int	main(int argc, char **argv)
 	if (!table.sem_meals)
 		forcend(table, NULL, PH_MEM_AERR);
 	initialize_semaphore(&table, table.n_philo);
-	//initialize pid malloc! memset to 0.
+	table.pid_id = malloc((table.n_philo + 2) * sizeof(pid_t));
+	if (!table.pid_id)
+		forcend(table, NULL, PH_MEM_AERR);
+	memset(&(table.pid_id), 0, table.n_philo + 2);
+	table.pid_id[table.n_philo + 1] = -1;
 	start_dinner(&table);
-/* 	if (pthread_join(table.monitor_id, NULL) != 0)
-		printf("Error: Unable to join monitor thread"); */
 	forcend(&table, PH_SUCCESS);
 }
