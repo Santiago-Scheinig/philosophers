@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 17:26:21 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/16 16:07:52 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,6 +112,7 @@ typedef struct s_rules
 	sem_t			*sem_print;
 	sem_t			*sem_forks;
 	sem_t			*sem_start;
+	sem_t			*sem_ready;
 	sem_t			**sem_philo;
 	char			**sem_names;
 }	t_rules;
@@ -149,6 +150,14 @@ typedef struct s_philosopher
 /*--------------------------------------------------------------------------*/
 
 /**
+ * Initializes all necesary threads to run the philosopher program.
+ * The amount of threads created is n_philo + 1 for the monitor.
+ * @param table A pointer to the main enviroment philosopher structure.
+ * @return A pointer to the allocated array of T_PHILOSOPHERS.
+ */
+int		initialize_dinner(t_rules *table);
+
+/**
  * Initializes all necessary semaphores to run the philosopher program.
  * 
  * 	- Death semaphore: Used to avoid data races with the death flag.
@@ -162,6 +171,17 @@ typedef struct s_philosopher
 void	initialize_semaphores(t_rules *table);
 
 /**
+ * Unlinks every semaphore created to run the philosopher program.
+ * 
+ * @param table A pointer to the main enviroment philosopher structure.
+ * 
+ * @note If any semaphore unlink fails, an error message is
+ * printed on screen detailing the failed semaphore, the program
+ * then exits with forcend(4).
+ */
+void	unlink_semaphores(t_rules *table);
+
+/**
  * Destroys every mutex created to run the philosopher program.
  * @param table The main enviroment philosopher structure.
  * @note If any mutex destruction fails, an error message is
@@ -169,18 +189,6 @@ void	initialize_semaphores(t_rules *table);
  * then exits with forcend(4).
  */
 void	close_semaphores(t_rules *table);
-
-void	unlink_semaphores(t_rules *table);
-
-void	initialize_sem_names(t_rules *table);
-
-/**
- * Initializes all necesary threads to run the philosopher program.
- * The amount of threads created is n_philo + 1 for the monitor.
- * @param table A pointer to the main enviroment philosopher structure.
- * @return A pointer to the allocated array of T_PHILOSOPHERS.
- */
-int		initialize_dinner(t_rules *table);
 
 /*--------------------------------------------------------------------------*/
 /*------------------------------ MUTEX_ACTIONS -----------------------------*/

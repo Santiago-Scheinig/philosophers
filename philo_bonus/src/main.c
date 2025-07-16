@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 17:30:46 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/16 16:04:37 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ void	forcend(t_rules *table, int errmsg)
 		{
 			close_semaphores(table);
 			unlink_semaphores(table);
+			free(table->sem_philo);
+			table->sem_philo = NULL;
 		}
 	}
 	if (table->pid_id)
@@ -102,17 +104,13 @@ static void	check_args(int argc, char **argv, t_rules *table)
 int	main(int argc, char **argv)
 {
 	t_rules	table;
-	int		i;
+	//int		i;
 
 	check_args(argc, argv, &table);
-	initialize_sem_names(&table);
-	table.sem_philo = malloc(sizeof(sem_t) * table.n_philo);
-	if (!table.sem_philo)
-		forcend(&table, PH_MEM_AERR);
 	initialize_semaphores(&table);
-	initialize_dinner(&table);
+/* 	initialize_dinner(&table);
 	i = -1;
 	while (++i < table.n_philo)
-		sem_post(table.sem_start);
+		sem_post(table.sem_start); */
 	forcend(&table, PH_SUCCESS);
 }

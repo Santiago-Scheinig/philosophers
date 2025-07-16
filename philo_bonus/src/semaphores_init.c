@@ -6,14 +6,22 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 15:23:49 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 16:44:58 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/16 16:06:39 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_sem.h"
 
-static char	*get_sem_name(char *name, int name_len, int id)
+static char	*get_sem_name(char *name, int id)
 {
+	const char	*base_name = "/philo_";
+	int			name_len;
+	int			i;
+
+	i = -1;
+	while (base_name[++i])
+		name[i] = base_name[i];
+	name_len = i;
 	while (id >= 10)
 	{
 		name[name_len] = (id % 10) + 48;
@@ -34,11 +42,10 @@ static char	*get_sem_name(char *name, int name_len, int id)
  * 
  * @note The id corresponding each philosopher proccess is inverted.
  */
-void	initialize_sem_names(t_rules *table)
+static void	initialize_sem_philo(t_rules *table)
 {
-	const char	*base_name = "/philo_";
 	static int	i = -1;
-	int			j;
+	char		*name;
 
 	table->sem_names = malloc((table->n_philo + 2) * sizeof(char *));
 	if (!table->sem_names)
@@ -46,7 +53,6 @@ void	initialize_sem_names(t_rules *table)
 	table->sem_names[table->n_philo + 1] = NULL;
 	while(++i < table->n_philo + 1)
 	{
-		j = -1;
 		table->sem_names[i] = malloc(20 * sizeof(char));
 		if (!table->sem_names[i])
 		{
@@ -55,9 +61,11 @@ void	initialize_sem_names(t_rules *table)
 			forcend(table, PH_MEM_AERR);
 		}
 		memset(table->sem_names[i], 0, (20 * sizeof(char)));
-		while (base_name[++j])
-			table->sem_names[i][j] = base_name[j];
-		table->sem_names[i] = get_sem_name(table->sem_names[i], 7, i);
+		table->sem_names[i] = get_sem_name(table->sem_names[i], i);
+		name = table->sem_names[i];
+		table->sem_philo[i] = sem_open(name, O_CREAT | O_EXCL, 0644, 1);
+		if (table->sem_philo[i] == SEM_FAILED)
+			forcend(table, PH_SEM_IERR);
 	}
 }
 
@@ -85,12 +93,14 @@ void	unlink_semaphores(t_rules *table)
 		ans += printf("Error: Unable to unlink /forks semaphore\n");
 	if (sem_unlink("/start"))
 		ans += printf("Error: Unable to unlink /start semaphore\n");
+	if (sem_unlink("/ready"))
+		ans += printf("Error: Unable to unlink /ready semaphore\n");
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
 		name = table->sem_names[i];
 		if (sem_unlink(name))
-			ans += printf("Error: Unable to unlink semaphore /philo_%d\n", i);
+			ans += printf("Error: Unable to unlink %s\n semaphore", name);
 	}
 	if (ans)
 		forcend(table, PH_SEM_UERR);
@@ -107,8 +117,9 @@ void	unlink_semaphores(t_rules *table)
  */
 void	close_semaphores(t_rules *table)
 {
-	int	i;
-	int	ans;
+	char	*name;
+	int		i;
+	int		ans;
 
 	ans = 0;
 	if (sem_close(table->sem_death))
@@ -119,14 +130,14 @@ void	close_semaphores(t_rules *table)
 		ans += printf("Error: Unable to close /forks semaphore\n");
 	if (sem_close(table->sem_start))
 		ans += printf("Error: Unable to close /start semaphore\n");
+	if (sem_close(table->sem_ready))
+		ans += printf("Error: Unable to close /ready semaphore\n");
 	i = -1;
 	while (++i < table->n_philo + 1)
-		if (sem_close(table->sem_philo[i]))
-			ans += printf("Error: Unable to close semaphore /philo_%d\n", i);
-	if (table->sem_philo)
 	{
-		free(table->sem_philo);
-		table->sem_philo = NULL;
+		name = table->sem_names[i];
+		if (sem_close(table->sem_philo[i]))
+			ans += printf("Error: Unable to close %s  semaphore\n", name);
 	}
 	if (ans)
 		forcend(table, PH_SEM_DERR);
@@ -149,14 +160,12 @@ void	close_semaphores(t_rules *table)
  */
 void	initialize_semaphores(t_rules *table)
 {
-	int		i;
 	int		forks;
-	char	*name;
 
 	forks = table->n_philo;
-	table->sem_death = sem_open("/death", O_CREAT | O_EXCL, 0644, 1);
+	table->sem_death = sem_open("/death", O_CREAT | O_EXCL, 0644, 0);
 	if (table->sem_death == SEM_FAILED)
-		forcend(NULL, PH_SEM_IERR);
+		forcend(table, PH_SEM_IERR);
 	table->sem_print = sem_open("/print", O_CREAT | O_EXCL, 0644, 1);
 	if (table->sem_print == SEM_FAILED)
 		forcend(table, PH_SEM_IERR);
@@ -166,12 +175,11 @@ void	initialize_semaphores(t_rules *table)
 	table->sem_start = sem_open("/start", O_CREAT | O_EXCL, 0644, 0);
 	if (table->sem_start == SEM_FAILED)
 		forcend(table, PH_SEM_IERR);
-	i = -1;
-	while (++i < table->n_philo + 1)
-	{
-		name = table->sem_names[i];
-		table->sem_philo[i] = sem_open(name, O_CREAT | O_EXCL, 0644, 1);
-		if (table->sem_philo[i] == SEM_FAILED)
-			forcend(table, PH_SEM_IERR);
-	}
+	table->sem_ready = sem_open("/ready", O_CREAT | O_EXCL, 0644, 0);
+	if (table->sem_ready == SEM_FAILED)
+		forcend(table, PH_SEM_IERR);
+	table->sem_philo = malloc(sizeof(sem_t) * table->n_philo);
+	if (!table->sem_philo)
+		forcend(table, PH_MEM_AERR);
+	initialize_sem_philo(table);
 }
