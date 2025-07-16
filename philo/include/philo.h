@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:52:48 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 19:14:06 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/16 15:41:26 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 
 # include <sys/time.h>
 # include <stdio.h>
-# include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
 # include <pthread.h>
+# include <stdlib.h>
 
 /*--------------------------------------------------------------------------*/
 /*------------------------------ ENUMERATIONS ------------------------------*/

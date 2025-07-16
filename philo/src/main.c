@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:56:24 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/16 15:41:46 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ int	forcend(t_rules *table, t_philosopher *seats, int errmsg)
 		"Thread creation failed"
 	};
 
+	if (errmsg)
+		printf("Error: %s\n", msg[errmsg]);
 	if (seats)
 		free(seats);
 	if (table)
 		if (&(table->forks) || &(table->meals))
 			return (destroy_mutex(table));
-	if (errmsg)
-		printf("Error: %s\n", msg[errmsg]);
 	return (errmsg);
 }
 
@@ -94,6 +94,6 @@ int	main(int argc, char **argv)
 	if (start_dinner(&table, &seats))
 		return (1);
 	if (pthread_join(table.monitor_id, NULL) != 0)
-		printf("Error: Unable to join monitor thread");
+		printf("Error: Unable to join monitor thread\n");
 	return (forcend(&table, seats, PH_SUCCESS));
 }
