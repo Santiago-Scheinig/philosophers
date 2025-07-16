@@ -6,16 +6,43 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:49:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 18:06:49 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/16 18:28:33 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-void	safe_sem_post(sem_t *sem, const char *context)
+#include "philo_sem.h"
+#include <errno.h>
+
+int	safe_sem_post(sem_t *sem, const char *sem_name)
 {
-	//used in case any sem_post fails!
+	if (sem_wait(sem) == -1)
+	{
+		printf("ERROR: sem_post failed on %s semaphore.\n", sem_name);
+		return (PH_SEM_PERR);
+	}
+	return (PH_SUCCESS);
 }
 
-void	safe_sem_wait(sem_t *sem, const char *context)
+int	safe_sem_wait(sem_t *sem, const char *sem_name)
 {
-	//used in case any sem_wait fails!
+	while (sem_wait(sem) == -1)
+	{
+		if (errno != EINTR)
+		{
+			printf("ERROR: sem_wait failed on %s semaphore.\n", sem_name);
+			return (PH_SEM_WERR);
+		}
+	}
+	return (PH_SUCCESS);
+}
+
+void	try_exit_and_kill(t_rules *table)
+{
+	safe_sem_wait(table->sem_philo[0]);
+	if (table->exit_flag == 0)
+	{
+		table->exit_flag = 1;
+		kill_all_philosophers(table);
+	}
+	safe_sem_post(table->sem_philo[0]);
 }

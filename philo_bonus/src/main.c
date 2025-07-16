@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/16 16:04:37 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/16 18:33:37 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,18 @@ void	split_free(char **split)
 void	forcend(t_rules *table, int errmsg)
 {
 	const char	*msg[] = {
-		"Success",
-		"Invalid amount of arguments",
-		"Invalid arguments",
-		"Semaphore initialization failed",
-		"Semaphore unlink failed",
-		"Semaphore destruction failed",
-		"Thread creation failed",
-		"Proccess creation failed",
-		"Waitpid of child proccess failed",
-		"Memory allocation failed",
+		"Invalid amount of arguments.",
+		"Invalid arguments.",
+		"Semaphore initialization failed.",
+		"Semaphore unlink failed.",
+		"Semaphore destruction failed.",
+		"Function sem_post() execution failed."
+		"Function sem_wait() execution failed."
+		"Thread creation failed.",
+		"Proccess creation failed.",
+		"Proccess killing execution failed",
+		"Waitpid of child proccess failed.",
+		"Memory allocation failed.",
 	};
 	if (table)
 	{
@@ -58,7 +60,7 @@ void	forcend(t_rules *table, int errmsg)
 	if (table->sem_names)
 		split_free(table->sem_names);
 	if (errmsg)
-		printf("Error: %s\n", msg[errmsg]);
+		printf("ERROR: %s\n", msg[errmsg]);
 	exit(errmsg);
 }
 
@@ -104,13 +106,10 @@ static void	check_args(int argc, char **argv, t_rules *table)
 int	main(int argc, char **argv)
 {
 	t_rules	table;
-	//int		i;
+	int		i;
 
 	check_args(argc, argv, &table);
 	initialize_semaphores(&table);
-/* 	initialize_dinner(&table);
-	i = -1;
-	while (++i < table.n_philo)
-		sem_post(table.sem_start); */
+ 	initialize_dinner(&table);
 	forcend(&table, PH_SUCCESS);
 }

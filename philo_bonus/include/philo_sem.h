@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/16 16:07:52 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/16 18:39:48 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@
 # include <semaphore.h>
 
 /*--------------------------------------------------------------------------*/
+/*--------------------------------- MACROS ---------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+# define THREAD_ERR(code) return ((void *)(__intptr_t)(code))
+
+/*--------------------------------------------------------------------------*/
 /*------------------------------ ENUMERATIONS ------------------------------*/
 /*--------------------------------------------------------------------------*/
 
@@ -39,8 +45,11 @@ typedef enum e_philo_errno
 	PH_SEM_IERR,		// Semaphore initialization failed
 	PH_SEM_UERR,		// Semaphore unlink failed
 	PH_SEM_DERR,		// Semaphore destruction failed
+	PH_SEM_PERR,		// Semaphore sem_post execution failed
+	PH_SEM_WERR,		// Semaphore sem_wait execution failed
 	PH_THD_CERR,		// Thread creation failed
 	PH_PCS_CERR,		// Proccess creation failed
+	PH_PCS_KERR,		// Proccess killing execution failed
 	PH_PID_WERR,		// Waitpid for proccess failed
 	PH_MEM_AERR,		// Memory allocation failed
 }	t_philo_errno;		// @param enum_format PH_*
@@ -103,6 +112,7 @@ typedef enum e_sem_print
 typedef struct s_rules
 {
 	int				n_philo;
+	int				exit_flag;
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
@@ -141,21 +151,13 @@ typedef struct s_philosopher
 	struct timeval	start_time;
 	struct timeval	last_meal_time;
 	char			*sem_name;
-	sem_t			*sem_meal;
+	sem_t			*sem_philo;
 	t_rules			*table;
 }	t_philosopher;
 
 /*--------------------------------------------------------------------------*/
 /*----------------------------- INITIALIZATION -----------------------------*/
 /*--------------------------------------------------------------------------*/
-
-/**
- * Initializes all necesary threads to run the philosopher program.
- * The amount of threads created is n_philo + 1 for the monitor.
- * @param table A pointer to the main enviroment philosopher structure.
- * @return A pointer to the allocated array of T_PHILOSOPHERS.
- */
-int		initialize_dinner(t_rules *table);
 
 /**
  * Initializes all necessary semaphores to run the philosopher program.
@@ -190,9 +192,62 @@ void	unlink_semaphores(t_rules *table);
  */
 void	close_semaphores(t_rules *table);
 
+/**
+ * Initializes all necesary threads to run the philosopher program.
+ * The amount of threads created is n_philo + 1 for the monitor.
+ * @param table A pointer to the main enviroment philosopher structure.
+ * @return A pointer to the allocated array of T_PHILOSOPHERS.
+ */
+void	initialize_dinner(t_rules *table);
+
+void	philosophize(t_rules *table, t_philosopher *seat);
+
 /*--------------------------------------------------------------------------*/
-/*------------------------------ MUTEX_ACTIONS -----------------------------*/
+/*---------------------------- THREADS_ROUTINES ----------------------------*/
 /*--------------------------------------------------------------------------*/
+
+void	*monitor_meals(void *arg);
+
+void	*monitor_death(void *arg);
+
+void	*philo_death(void *arg);
+
+/*--------------------------------------------------------------------------*/
+/*--------------------------- SEMAPHORE_ACTIONS ----------------------------*/
+/*--------------------------------------------------------------------------*/
+
+void	safe_sem_wait(sem_t *sem, const char *context);
+
+void	safe_sem_post(sem_t *sem, const char *context);
+
+void	try_exit_and_kill(t_rules *table);
+
+/*--------------------------------------------------------------------------*/
+/*---------------------------------- UTILS ---------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/**
+ * Finds the first number on a STRING with a decimal base.
+ * @param str The string where the base number is saved.
+ * @param base The base in which the number must be found.
+ * @return The decimal INT found on STR.
+ * @note A number can, but is not forced to, start with any
+ * amount of spaces and one sign; but the next character must 
+ * be a digit, if not or str doesn't exists, returns 0.
+ */
+int			ft_atoi(const char *nptr);
+
+/**
+ * Philosopher failsafe, in case of error, frees all memory that could remain
+ * allocated in the main structure, and destroy any created mutex.
+ * @param table A pointer to the main environment philosopher structure.
+ * @param errmsg The error number which points to its error string.
+ */
+void	forcend(t_rules *table, int errmsg);
+
+
+
+
 
 /**
  * Using the t_mtx_flag enum, executes instructions on the death_flag
@@ -235,33 +290,10 @@ int			to_meals_value(t_philosopher *seat, t_sem_flag action);
  */
 void		to_print_access(t_philosopher *seat, t_sem_print action);
 
-/*--------------------------------------------------------------------------*/
-/*---------------------------------- UTILS ---------------------------------*/
-/*--------------------------------------------------------------------------*/
-
 void		*monitorize(void *arg);
 
 void		*philo(void *arg);
 
 int	cronometer(struct timeval last_meal, long ms_death);
-
-/**
- * Finds the first number on a STRING with a decimal base.
- * @param str The string where the base number is saved.
- * @param base The base in which the number must be found.
- * @return The decimal INT found on STR.
- * @note A number can, but is not forced to, start with any
- * amount of spaces and one sign; but the next character must 
- * be a digit, if not or str doesn't exists, returns 0.
- */
-int			ft_atoi(const char *nptr);
-
-/**
- * Philosopher failsafe, in case of error, frees all memory that could remain
- * allocated in the main structure, and destroy any created mutex.
- * @param table A pointer to the main environment philosopher structure.
- * @param errmsg The error number which points to its error string.
- */
-void	forcend(t_rules *table, int errmsg);
 
 #endif
