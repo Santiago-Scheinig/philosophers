@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 15:23:49 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/16 16:06:39 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 16:30:20 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,9 +98,10 @@ void	unlink_semaphores(t_rules *table)
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
+		//name = get_sem_name(table->sem_names[i], i);
 		name = table->sem_names[i];
 		if (sem_unlink(name))
-			ans += printf("Error: Unable to unlink %s\n semaphore", name);
+			ans += printf("Error: Unable to unlink %s semaphore\n", name);
 	}
 	if (ans)
 		forcend(table, PH_SEM_UERR);
@@ -135,6 +136,7 @@ void	close_semaphores(t_rules *table)
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
+		//name = get_sem_name(table->sem_names[i], i);
 		name = table->sem_names[i];
 		if (sem_close(table->sem_philo[i]))
 			ans += printf("Error: Unable to close %s  semaphore\n", name);
@@ -178,7 +180,7 @@ void	initialize_semaphores(t_rules *table)
 	table->sem_ready = sem_open("/ready", O_CREAT | O_EXCL, 0644, 0);
 	if (table->sem_ready == SEM_FAILED)
 		forcend(table, PH_SEM_IERR);
-	table->sem_philo = malloc(sizeof(sem_t) * table->n_philo);
+	table->sem_philo = malloc(sizeof(sem_t) * (table->n_philo + 1));
 	if (!table->sem_philo)
 		forcend(table, PH_MEM_AERR);
 	initialize_sem_philo(table);

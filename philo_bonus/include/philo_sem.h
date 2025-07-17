@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/16 18:39:48 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:50:46 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 # include <stdio.h>
+# include <signal.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
@@ -39,20 +40,23 @@
  */
 typedef enum e_philo_errno
 {
-	PH_SUCCESS = 0,		// Success
-	PH_ARG_CINV,		// Amount of arguments isn't valid
-	PH_ARG_VINV,		// Arguments aren't valid
-	PH_SEM_IERR,		// Semaphore initialization failed
-	PH_SEM_UERR,		// Semaphore unlink failed
-	PH_SEM_DERR,		// Semaphore destruction failed
-	PH_SEM_PERR,		// Semaphore sem_post execution failed
-	PH_SEM_WERR,		// Semaphore sem_wait execution failed
-	PH_THD_CERR,		// Thread creation failed
-	PH_PCS_CERR,		// Proccess creation failed
-	PH_PCS_KERR,		// Proccess killing execution failed
-	PH_PID_WERR,		// Waitpid for proccess failed
-	PH_MEM_AERR,		// Memory allocation failed
-}	t_philo_errno;		// @param enum_format PH_*
+	PH_FATAL_ERROR = -1,	// Fatal system error, force exit
+	PH_SUCCESS,				// Success
+	PH_ARG_CINV,			// Amount of arguments isn't valid
+	PH_ARG_VINV,			// Arguments aren't valid
+	PH_SEM_IERR,			// Semaphore initialization failed
+	PH_SEM_UERR,			// Semaphore unlink failed
+	PH_SEM_DERR,			// Semaphore destruction failed
+	PH_SEM_PERR,			// Semaphore sem_post execution failed
+	PH_SEM_WERR,			// Semaphore sem_wait execution failed
+	PH_THD_CERR,			// Thread creation failed
+	PH_THD_EERR,			// Thread execution failed
+	PH_THD_JERR,			// Thread join failed
+	PH_PCS_CERR,			// Proccess creation failed
+	PH_PCS_KERR,			// Proccess killing execution failed
+	PH_PID_WERR,			// Waitpid for proccess failed
+	PH_MEM_AERR,			// Memory allocation failed
+}	t_philo_errno;			// @param enum_format PH_*
 
 /**
  * An enumeration list of time codes to identify specific actions to perform
@@ -210,17 +214,19 @@ void	*monitor_meals(void *arg);
 
 void	*monitor_death(void *arg);
 
+void	*monitor_start(void *arg);
+
 void	*philo_death(void *arg);
 
 /*--------------------------------------------------------------------------*/
 /*--------------------------- SEMAPHORE_ACTIONS ----------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void	safe_sem_wait(sem_t *sem, const char *context);
+int	safe_sem_wait(sem_t *sem, const char *sem_name);
 
-void	safe_sem_post(sem_t *sem, const char *context);
+int	safe_sem_post(sem_t *sem, const char *sem_name);
 
-void	try_exit_and_kill(t_rules *table);
+int	try_exit_and_kill(t_rules *table, int errcode);
 
 /*--------------------------------------------------------------------------*/
 /*---------------------------------- UTILS ---------------------------------*/

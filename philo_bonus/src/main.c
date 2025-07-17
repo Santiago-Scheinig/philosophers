@@ -6,63 +6,11 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/16 18:33:37 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 16:29:58 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_sem.h"
-
-void	split_free(char **split)
-{
-	int	i;
-
-	i = -1;
-	while (split[++i])
-		free(split[i]);
-	free(split);	
-}
-
-/**
- * Philosopher failsafe, in case of error, frees all memory that could remain
- * allocated in the main structure, and closes/unlinks any created semaphore.
- * 
- * @param table A pointer to the main enviroment philosopher structure.
- * @param errmsg The error number which points to its error string.
- */
-void	forcend(t_rules *table, int errmsg)
-{
-	const char	*msg[] = {
-		"Invalid amount of arguments.",
-		"Invalid arguments.",
-		"Semaphore initialization failed.",
-		"Semaphore unlink failed.",
-		"Semaphore destruction failed.",
-		"Function sem_post() execution failed."
-		"Function sem_wait() execution failed."
-		"Thread creation failed.",
-		"Proccess creation failed.",
-		"Proccess killing execution failed",
-		"Waitpid of child proccess failed.",
-		"Memory allocation failed.",
-	};
-	if (table)
-	{
-		if (table->sem_philo)
-		{
-			close_semaphores(table);
-			unlink_semaphores(table);
-			free(table->sem_philo);
-			table->sem_philo = NULL;
-		}
-	}
-	if (table->pid_id)
-		free(table->pid_id);
-	if (table->sem_names)
-		split_free(table->sem_names);
-	if (errmsg)
-		printf("ERROR: %s\n", msg[errmsg]);
-	exit(errmsg);
-}
 
 /**
  * Verifies user input and initializes the main enviroment structure with
@@ -106,10 +54,19 @@ static void	check_args(int argc, char **argv, t_rules *table)
 int	main(int argc, char **argv)
 {
 	t_rules	table;
-	int		i;
 
 	check_args(argc, argv, &table);
+/* 	table.sem_names = malloc((table.n_philo + 2) * sizeof(char *));
+	if (!table.sem_names)
+		forcend(&table, PH_MEM_AERR);
+	int i = -1;
+	while(++i < table.n_philo + 1)
+		table.sem_names[i] = malloc(20 * sizeof(char));
+	unlink_semaphores(&table);
+	close_semaphores(&table); */
 	initialize_semaphores(&table);
- 	initialize_dinner(&table);
 	forcend(&table, PH_SUCCESS);
+	return 1;
+	//All good til here
+ 	initialize_dinner(&table);
 }

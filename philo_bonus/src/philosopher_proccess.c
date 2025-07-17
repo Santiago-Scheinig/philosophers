@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:49:01 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/16 17:09:06 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:52:37 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 void	philosophize(t_rules *table, t_philosopher *seat)
 {
+	if (table && seat)
+		printf("hello!");
 	//create the philo_death thread
 	//signal sem_post(ready)
 	//sem_wait(start) waiting for the main to start the dinner

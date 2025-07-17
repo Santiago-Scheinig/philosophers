@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:34:46 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/16 18:44:51 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 15:51:34 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,14 @@ void	*monitor_death(void *arg)
 	int		i;
 
 	table = (t_rules *) arg;
-	if (safe_sem_wait(table->sem_death))
-		if (try_exit_and_kill(table))
-			return (THREAD_ERR(PH_PCS_KERR));
-	if (try_exit_and_kill(table))
-		return (THREAD_ERR(PH_PCS_KERR));
+	if (safe_sem_wait(table->sem_death, "/death"))
+		THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
+	if (try_exit_and_kill(table, PH_SUCCESS))
+		THREAD_ERR(PH_PCS_KERR);
 	i = -1;
 	while (++i < table->n_philo)
-		if (safe_sem_post(table->sem_ready))
-			return (THREAD_ERR(PH_SEM_PERR));
+		if (safe_sem_post(table->sem_ready, "/ready"))
+			THREAD_ERR(PH_SEM_PERR);
 	return (NULL);
 }
 
@@ -37,14 +36,32 @@ void	*monitor_meals(void *arg)
 
 	table = (t_rules *) arg;
 	i = -1;
+	if (safe_sem_wait(table->sem_start, "/start"))
+		THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
 	while (++i < table->n_philo)
-		if (safe_sem_wait(table->sem_ready))
-			if (try_exit_and_kill(table))
-				return ((void *)(__intptr_t) PH_PCS_KERR);
-	if (try_exit_and_kill(table))
-		return ((void *)(__intptr_t) PH_PCS_KERR);
-	if (safe_sem_post(table->sem_death))
-		return ((void *)(__intptr_t) PH_SEM_PERR);
+		if (safe_sem_wait(table->sem_ready, "/ready"))
+			THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
+	if (try_exit_and_kill(table, PH_SUCCESS))
+		THREAD_ERR(PH_PCS_KERR);
+	if (safe_sem_post(table->sem_death, "/death"))
+		THREAD_ERR(PH_SEM_PERR);
+	return (NULL);
+}
+
+void	*monitor_start(void *arg)
+{
+	t_rules	*table;
+	int		i;
+	
+	table = (t_rules *) arg;
+	i = -1;
+	while (++i < table->n_philo)
+		if (safe_sem_wait(table->sem_ready, "/ready"))
+			THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
+	i = -1;
+	while (++i < (table->n_philo + 1))
+		if (safe_sem_post(table->sem_start, "/start"))
+			THREAD_ERR(try_exit_and_kill(table, PH_SEM_PERR));
 	return (NULL);
 }
 
@@ -54,4 +71,5 @@ void	*philo_death(void *arg)
 	
 	seat = (t_philosopher *) arg;
 	//CHECK DEATH
+	return (NULL);
 }
