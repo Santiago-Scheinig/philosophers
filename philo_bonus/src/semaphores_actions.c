@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:49:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 15:52:05 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 18:52:57 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,10 @@ int try_exit_and_kill(t_rules *table, int errcode)
 		error = 0;
 		while (table->pid_id[++i] != -1)
 		{
-			if (kill(table->pid_id[i], SIGTERM))
+			if (kill(table->pid_id[i], SIGTERM) == -1)
 			{
 				error = 1;
-				printf("thd: kill %i pid proccess failed\n", table->pid_id[i]);
+				printf("thd: kill %i pid proccess failed\n", i);
 			}
 		}
 		if (error)

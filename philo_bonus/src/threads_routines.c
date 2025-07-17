@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:34:46 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 15:51:34 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 18:50:12 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,10 @@ void	*philo_death(void *arg)
 	t_philosopher *seat;
 	
 	seat = (t_philosopher *) arg;
-	//CHECK DEATH
+	while (1)
+	{
+		printf("Im cheking\n");
+		usleep(10000);
+	}
 	return (NULL);
 }

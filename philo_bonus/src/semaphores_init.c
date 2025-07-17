@@ -6,15 +6,21 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 15:23:49 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 16:30:20 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 18:59:31 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_sem.h"
 
-static char	*get_sem_name(char *name, int id)
+/**
+ * Generates a unique name for a semaphore.
+ * 
+ * @param base_name The type that identifies the semaphore.
+ * @param name A pointer to an allocated string where to save the name.
+ * @param id The id that identifies the semaphore.
+ */
+static char	*get_sem_name(const char *base_name, char *name, int id)
 {
-	const char	*base_name = "/philo_";
 	int			name_len;
 	int			i;
 
@@ -61,7 +67,7 @@ static void	initialize_sem_philo(t_rules *table)
 			forcend(table, PH_MEM_AERR);
 		}
 		memset(table->sem_names[i], 0, (20 * sizeof(char)));
-		table->sem_names[i] = get_sem_name(table->sem_names[i], i);
+		table->sem_names[i] = get_sem_name("/philo_", table->sem_names[i], i);
 		name = table->sem_names[i];
 		table->sem_philo[i] = sem_open(name, O_CREAT | O_EXCL, 0644, 1);
 		if (table->sem_philo[i] == SEM_FAILED)
@@ -98,13 +104,10 @@ void	unlink_semaphores(t_rules *table)
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
-		//name = get_sem_name(table->sem_names[i], i);
 		name = table->sem_names[i];
 		if (sem_unlink(name))
 			ans += printf("Error: Unable to unlink %s semaphore\n", name);
 	}
-	if (ans)
-		forcend(table, PH_SEM_UERR);
 }
 
 /**
@@ -136,13 +139,10 @@ void	close_semaphores(t_rules *table)
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
-		//name = get_sem_name(table->sem_names[i], i);
 		name = table->sem_names[i];
 		if (sem_close(table->sem_philo[i]))
 			ans += printf("Error: Unable to close %s  semaphore\n", name);
 	}
-	if (ans)
-		forcend(table, PH_SEM_DERR);
 }
 
 /**

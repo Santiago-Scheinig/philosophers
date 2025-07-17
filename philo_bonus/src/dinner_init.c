@@ -6,13 +6,13 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 19:36:30 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 16:03:06 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 18:55:08 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_sem.h"
 
-static int	join_threads(pthread_t thd_a, pthread_t thd_b, pthread_t thd_c)
+static int	join_threads(pthread_t thd_a, pthread_t thd_b,  pthread_t thd_c)
 {
 	void		*ret;
 
@@ -100,20 +100,20 @@ static void	create_monitor(t_rules *table)
 	pthread_t	thd_death_id;
 	pthread_t	thd_meals_id;
 	pthread_t	thd_start_id;
-	int			status;
+	int			status = 0;
 	
 	table->pid_id[0] = fork();
 	if (table->pid_id[0] < 0)
 		forcend(table, PH_PCS_CERR);
 	if (!table->pid_id[0])
 	{
+		status = create_philosophers(table);
 		if (pthread_create(&(thd_death_id), NULL, monitor_death, table))
 			exit(PH_THD_CERR);
 		if (pthread_create(&(thd_meals_id), NULL, monitor_meals, table))
 			exit(PH_THD_CERR);
 		if (pthread_create(&(thd_start_id), NULL, monitor_start, table))
 			exit(PH_THD_CERR);
-		status = create_philosophers(table);
 		status = monitor_philo(status);
 		if (status && status != PH_THD_EERR)
 			exit (status);
@@ -137,8 +137,6 @@ void	initialize_dinner(t_rules *table)
 	if (!table->pid_id)
 		forcend(table, PH_MEM_AERR);
 	memset(table->pid_id, -1, (table->n_philo + 2) * sizeof(pid_t));
-	return ;
-	//All good til here
 	create_monitor(table);
 	if (waitpid(table->pid_id[0], &status, 0) == -1)
 		printf("FATAL: can't wait for monitor, dont know if something went wrong or not");

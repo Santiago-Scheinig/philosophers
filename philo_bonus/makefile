@@ -122,6 +122,9 @@ bonus: $(NAME_DEPS) $(LIB_BON) src/main_bonus.c
 	src/main_bonus.c $(NAME_LIBS) $(LIB_BON) -o $(NAME)_bonus
 	@echo "$(C_G)[✓] $(NAME)_bonus - Program built successfully.$(C_END)"
 
+fix: src/main_reset
+	@$(CC) $(CPPFLAGS) $(CFLAGS) src/main_reset.c -o fix
+
 # Removes every object inside $(OBJ_DIR) and the directory itself.			#
 clean:
 ifeq ($(LIBFT_USE), 1)

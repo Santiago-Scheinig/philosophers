@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 16:29:58 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/17 18:55:32 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,22 +51,13 @@ static void	check_args(int argc, char **argv, t_rules *table)
 		forcend(NULL, PH_ARG_VINV);
 }
 
+
 int	main(int argc, char **argv)
 {
 	t_rules	table;
 
 	check_args(argc, argv, &table);
-/* 	table.sem_names = malloc((table.n_philo + 2) * sizeof(char *));
-	if (!table.sem_names)
-		forcend(&table, PH_MEM_AERR);
-	int i = -1;
-	while(++i < table.n_philo + 1)
-		table.sem_names[i] = malloc(20 * sizeof(char));
-	unlink_semaphores(&table);
-	close_semaphores(&table); */
 	initialize_semaphores(&table);
+	initialize_dinner(&table);
 	forcend(&table, PH_SUCCESS);
-	return 1;
-	//All good til here
- 	initialize_dinner(&table);
 }
