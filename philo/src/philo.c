@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 20:28:51 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/12 13:29:24 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 17:32:39 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,8 @@
  */
 static void	grab_forks(t_philosopher *seat)
 {
-	int	ms_death;
-
 	if (!(seat->id % 2))
 	{
-		ms_death = seat->table->time_to_die;
 		pthread_mutex_lock(seat->left_fork);
 		pthread_mutex_lock(seat->right_fork);
 		to_print_access(seat, MTX_PRINT_FORK);
