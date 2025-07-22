@@ -6,13 +6,27 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 12:00:38 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 18:36:21 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 20:13:25 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_sem.h"
 
-void	split_free(char **split)
+void	cleanup_philo_sem(t_rules *table, int i)
+{
+	while (--i >= 0)
+	{
+		free(table->sem_names[i]);
+		if (sem_close(table->sem_philo[i]))
+			printf("sem: unable to close %s\n", table->sem_names[i]);
+		if (sem_unlink(table->sem_names[i]))
+			printf("sem: unable to unlink %s\n", table->sem_names[i]);
+	}
+	table->clean_up = 1;
+	forcend(table, PH_MEM_AERR);
+}
+
+static void	split_free(char **split)
 {
 	int	i;
 
@@ -22,6 +36,38 @@ void	split_free(char **split)
 	free(split);	
 }
 
+static void	cleanup_all(t_rules *table)
+{
+	if (table)
+	{
+		if (table->sem_philo)
+		{
+			if (!table->clean_up)
+			{
+				close_semaphores(table);
+				unlink_semaphores(table);
+			}
+			free(table->sem_philo);
+			table->sem_philo = NULL;
+		}
+		if (table->pid_id)
+			free(table->pid_id);
+		if (table->sem_names)
+			split_free(table->sem_names);
+	}
+}
+
+static void	print_err(const char *msg[], int errmsg)
+{
+	if (errmsg)
+	{
+		if (errmsg == PH_THD_JERR || errmsg == PH_PID_MERR 
+		|| errmsg == PH_THD_EERR || errmsg == PH_KILL_ERR)
+			printf("FATAL: %s. Force manual exit.\n", msg[errmsg]);
+		else
+			printf("ERROR: %s\n", msg[errmsg]);
+	}
+}
 /**
  * Philosopher failsafe, in case of error, frees all memory that could remain
  * allocated in the main structure, and closes/unlinks any created semaphore.
@@ -41,27 +87,15 @@ void	forcend(t_rules *table, int errmsg)
 		"function sem_post() execution failed",
 		"function sem_wait() execution failed",
 		"thread creation failed",
-		"FATAL: Thread join failed",
+		"thread execution terminated unexpectecly. Program status unknown",
+		"monitor thread join failed. Program status unknown",
 		"proccess creation failed",
 		"proccess killing execution failed",
-		"waitpid of child proccess failed",
+		"waitpid for monitor proccess failed. Program status unknown",
 		"memory allocation failed",
+		"function kill() failed. Unable to terminate failing proccesses.",
 	};
-	if (errmsg)//PH_THD_JERR || PH_PID_MERR || PH_THD_EERR || PH_KILL_ERR are FATAL errors.
-		printf("ERROR: %s\n", msg[errmsg]);
-	if (table)
-	{
-		if (table->sem_philo)
-		{
-			close_semaphores(table);
-			unlink_semaphores(table);
-			free(table->sem_philo);
-			table->sem_philo = NULL;
-		}
-		if (table->pid_id)
-			free(table->pid_id);
-		if (table->sem_names)
-			split_free(table->sem_names);
-	}
+	print_err(msg, errmsg);
+	cleanup_all(table);
 	exit(errmsg);
 }

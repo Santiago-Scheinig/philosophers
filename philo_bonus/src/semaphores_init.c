@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 15:23:49 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 19:50:20 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:59:11 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ void	close_semaphores(t_rules *table)
 	{
 		name = table->sem_names[i];
 		if (sem_close(table->sem_philo[i]))
-			ans += printf("sem: unable to close %s  semaphore\n", name);
+			ans += printf("sem: unable to close %s semaphore\n", name);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 18:59:52 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 20:02:24 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,7 @@ typedef enum e_sem_print
  */
 typedef struct s_rules
 {
+	int				clean_up;
 	int				n_philo;
 	int				exit_flag;
 	int				time_to_die;
