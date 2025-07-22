@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:58:40 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 20:02:24 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:00:55 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,6 @@
 # include <unistd.h>
 # include <pthread.h>
 # include <semaphore.h>
-
-/*--------------------------------------------------------------------------*/
-/*--------------------------------- MACROS ---------------------------------*/
-/*--------------------------------------------------------------------------*/
-
-# define THREAD_ERR(code) return ((void *)(__intptr_t)(code))
 
 /*--------------------------------------------------------------------------*/
 /*------------------------------ ENUMERATIONS ------------------------------*/
@@ -161,15 +155,19 @@ typedef struct s_philosopher
 /**
  * Initializes all necessary semaphores to run the philosopher program.
  * 
- * 	- Death semaphore: Used to avoid data races with the death flag.
+ * 	- Death semaphore: Used to follow-up proccesses death.
  *
- * 	- Print semaphore: Used to avoid data races with the print flag.
+ * 	- Print semaphore: Used to avoid write interleaving between proccesses.
  * 
- * 	- Forks semaphore: Used to avoid data races, and follow remaining forks.
+ * 	- Forks semaphore: Used to follow-up remaining forks.
+ * 
+ *	- Start semaphore: Used to link the start of philosopher proccesses.
+ * 
+ *	- Philo semaphore: Used to avoid data races with philosopher threads.
  * 
  * @param table A pointer to the main enviroment philosopher structure.
  */
-void	initialize_semaphores(t_rules *table);
+void			initialize_semaphores(t_rules *table);
 
 /**
  * Unlinks every semaphore created to run the philosopher program.
@@ -180,72 +178,94 @@ void	initialize_semaphores(t_rules *table);
  * printed on screen detailing the failed semaphore, the program
  * then exits with forcend(4).
  */
-void	unlink_semaphores(t_rules *table);
+void			unlink_semaphores(t_rules *table);
 
 /**
- * Destroys every mutex created to run the philosopher program.
- * @param table The main enviroment philosopher structure.
- * @note If any mutex destruction fails, an error message is
- * printed on screen detailing the failed mutex, the program
- * then exits with forcend(4).
- */
-void	close_semaphores(t_rules *table);
-
-/**
- * Initializes all necesary threads to run the philosopher program.
- * The amount of threads created is n_philo + 1 for the monitor.
+ * Close every semaphore created to run the philosopher program.
+ * 
  * @param table A pointer to the main enviroment philosopher structure.
- * @return A pointer to the allocated array of T_PHILOSOPHERS.
+ * 
+ * @note If any semaphore close fails, an error message is
+ * printed on screen detailing the failed semaphore, the program
+ * then exits with forcend(5).
  */
-void	initialize_dinner(t_rules *table);
+void			close_semaphores(t_rules *table);
 
-void	philosophize(t_philosopher *seat);
+/**
+ * Initializes all necesary proccesses to run the philosopher program.
+ * The amount created is n_philo + 1 for the monitor.
+ * @param table A pointer to the main enviroment philosopher structure.
+ * @note Once all initialization is done, it will wait for the monitor
+ * proccessor to end the program.
+ */
+void			initialize_dinner(t_rules *table);
+
+/**
+ * The philosopher proccess routine.
+ * 
+ * - Sets the [last_meal_time] to [start_time].
+ * 
+ * - If odd, waits ([time_to_eat] / 2) to create eating waves.
+ * 
+ * - A personal thread checks regulary if proccess died by starvation.
+ * 
+ * - Thinks, eats and sleeps.
+ * 
+ * @param seat A pointer to a T_PHILOSOPHER structure linked to the last_meal
+ * timestamp variable.
+ * @note If [n_philosopher] it's an odd amount, uses is_hungry() to set 
+ * priorities between waves.
+ */
+void			philosophize(t_philosopher *seat);
 
 /*--------------------------------------------------------------------------*/
 /*---------------------------- THREADS_ROUTINES ----------------------------*/
 /*--------------------------------------------------------------------------*/
 
-void	*monitor_meals(void *arg);
-
-void	*monitor_death(void *arg);
-
-void	*monitor_start(void *arg);
-
-void	*philo_death(void *arg);
-
-/*--------------------------------------------------------------------------*/
-/*------------------------- SEMAPHORE_TROUBLESHOOT -------------------------*/
-/*--------------------------------------------------------------------------*/
-
-int	safe_sem_wait(sem_t *sem, const char *sem_name, int id);
-
-int	safe_sem_post(sem_t *sem, const char *sem_name, int id);
-
-int	try_exit_and_kill(t_rules *table, int errcode);
-
-/*--------------------------------------------------------------------------*/
-/*---------------------------------- UTILS ---------------------------------*/
-/*--------------------------------------------------------------------------*/
+/**
+ * A monitor local thread that waits on the death semaphore, ready to kill
+ * every other child proccess if any of them dies.
+ * 
+ * @param arg A pointer to the main philosopher structure.
+ * @return A pointer to an errcode if any.
+ * @note Failures on this local thread are consider sensitive.
+ */
+void			*monitor_death(void *arg);
 
 /**
- * Finds the first number on a STRING with a decimal base.
- * @param str The string where the base number is saved.
- * @param base The base in which the number must be found.
- * @return The decimal INT found on STR.
- * @note A number can, but is not forced to, start with any
- * amount of spaces and one sign; but the next character must 
- * be a digit, if not or str doesn't exists, returns 0.
+ * A monitor local thread that waits on the meals semaphore, ready to kill
+ * every other child proccess once the max meals quota is accomplished.
+ * 
+ * @param arg A pointer to the main philosopher structure.
+ * @return A pointer to an errcode if any.
+ * @note Failures on this local thread are consider sensitive.
  */
-int			ft_atoi(const char *nptr);
+void			*monitor_meals(void *arg);
 
 /**
- * Philosopher failsafe, in case of error, frees all memory that could remain
- * allocated in the main structure, and destroy any created mutex.
- * @param table A pointer to the main environment philosopher structure.
- * @param errmsg The error number which points to its error string.
+ * A monitor local thread that waits on the ready semaphore, used to
+ * wait for every proccess to be ready, before starting the experiment.
+ * 
+ * @param arg A pointer to the main philosopher structure.
+ * @return A pointer to an errcode if any.
+ * @note Failures on this local thread are consider sensitive.
  */
-void	forcend(t_rules *table, int errmsg);
+void			*monitor_start(void *arg);
 
+/**
+ * A philosopher local thread used to verify [last_meal_time] and
+ * [time_to_die] difference, setting the [sem_death] to 1 as well
+ * as blocking the [sem_print] in order to prevent further writing
+ * on STDIN and signal the monitor for it's own death.
+ * 
+ * @param arg A pointer to the main philosopher structure.
+ * @return NULL since this thread it's detatched.
+ */
+void			*philo_death(void *arg);
+
+/*--------------------------------------------------------------------------*/
+/*---------------------------- SEMAPHORE_ACTIONS ---------------------------*/
+/*--------------------------------------------------------------------------*/
 
 /**
  * Using the t_mtx_time enum, executes instructions on the last_meal timestamp
@@ -265,7 +285,74 @@ struct timeval	to_time_value(t_philosopher *seat, t_sem_time action);
  * @param seat A pointer to the T_PHILOSOPHER linked to the message.
  * @param action The action to perform into death_flag.
  */
-void		to_print_access(t_philosopher *seat, t_sem_print action);
+void			to_print_access(t_philosopher *seat, t_sem_print action);
 
+/*--------------------------------------------------------------------------*/
+/*------------------------- SEMAPHORE_TROUBLESHOOT -------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/**
+ * Failsafe for sem_wait().
+ * 
+ * @param sem A pointer to the semaphore to wait.
+ * @param sem_name The name of the semaphore to wait.
+ * @return 0 on success. On error, the specific errcode.
+ * @note If sem_wait() fails, an error log is printed on STDOUT.
+ */
+int				safe_sem_wait(sem_t *sem, const char *sem_name, int id);
+
+/**
+ * Failsafe for sem_post().
+ * 
+ * @param sem A pointer to the semaphore to post.
+ * @param sem_name The name of the semaphore to post.
+ * @return 0 on success. On error, the specific errcode.
+ * @note If sem_post() fails, an error log is printed on STDOUT.
+ */
+int				safe_sem_post(sem_t *sem, const char *sem_name, int id);
+
+/**
+ * Cleanly kills all child proccesses with SEGTERM.
+ * 
+ * @param table A pointer to the main philosopher structure.
+ * @param errcode The errcode that triggered the exit and kill proccess.
+ * @return The errcode that triggered the exit and kill proccess.
+ * @note Any error occured during this execution it's consider sensitive, and
+ * will execute kill_all() as a countermeasure.
+ */
+int				try_exit_and_kill(t_rules *table, int errcode);
+
+/*--------------------------------------------------------------------------*/
+/*---------------------------------- UTILS ---------------------------------*/
+/*--------------------------------------------------------------------------*/
+
+/**
+ * Finds the first number on a STRING with a decimal base.
+ * @param str The string where the base number is saved.
+ * @param base The base in which the number must be found.
+ * @return The decimal INT found on STR.
+ * @note A number can, but is not forced to, start with any
+ * amount of spaces and one sign; but the next character must 
+ * be a digit, if not or str doesn't exists, returns 0.
+ */
+int				ft_atoi(const char *nptr);
+
+/**
+ * Cleans up all allocated memory after failing during initialization, as well
+ * as close and unlink any created semaphores until that moment.
+ * 
+ * @param table A pointer to the main enviroment philosopher strucutre.
+ * @param i The previous index before the initialization failed.
+ * @note This execution also terminates the program. 
+ */
+void			cleanup_philo_sem(t_rules *table, int i);
+
+/**
+ * Philosopher failsafe, in case of error, frees all memory that could remain
+ * allocated in the main structure, and destroy any created mutex.
+ * @param table A pointer to the main environment philosopher structure.
+ * @param errmsg The error number which points to its error string.
+ */
+void			forcend(t_rules *table, int errmsg);
 
 #endif

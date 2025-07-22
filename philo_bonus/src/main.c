@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 16:27:41 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:03:31 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ static void	check_args(int argc, char **argv, t_rules *table)
 	if (table->meals_required < 0)
 		forcend(NULL, PH_ARG_VINV);
 }
-
 
 int	main(int argc, char **argv)
 {

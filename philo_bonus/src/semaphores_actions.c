@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 18:47:45 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 20:44:45 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:04:29 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
  * @return If is_eating is true, returns the current timeval. Else, returns 
  * the [last_meal_time], on seat, in timeval.
  */
-struct timeval to_time_value(t_philosopher *seat, t_sem_time action)
+struct timeval	to_time_value(t_philosopher *seat, t_sem_time action)
 {
 	struct timeval	val;
 
@@ -71,7 +71,7 @@ static long	get_time_of_dinner(struct timeval start_time)
  * @note After execution it exits, leaving /print semaphore in 0 and avoiding
  * furhter messages.
  */
-static void print_death_status(t_philosopher *seat, long ms_tv)
+static void	print_death_status(t_philosopher *seat, long ms_tv)
 {
 	if (safe_sem_post(seat->table->sem_death, "/death", -1))
 		exit(PH_SEM_PERR);
@@ -89,7 +89,7 @@ static void print_death_status(t_philosopher *seat, long ms_tv)
  */
 void	to_print_access(t_philosopher *seat, t_sem_print action)
 {
-	long ms_tv;
+	long	ms_tv;
 
 	ms_tv = get_time_of_dinner(seat->start_time);
 	if (safe_sem_wait(seat->table->sem_print, "/print", -1))

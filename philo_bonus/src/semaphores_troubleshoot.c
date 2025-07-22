@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:49:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 18:53:49 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:04:06 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ int	safe_sem_wait(sem_t *sem, const char *sem_name, int id)
  */
 static int	kill_all(t_rules *table, int index)
 {
-	int error;
+	int	error;
 
 	error = 0;
 	while (index < table->n_philo)
@@ -98,7 +98,7 @@ static int	kill_all(t_rules *table, int index)
  * @note Any error occured during this execution it's consider sensitive, and
  * will execute kill_all() as a countermeasure.
  */
-int try_exit_and_kill(t_rules *table, int errcode)
+int	try_exit_and_kill(t_rules *table, int errcode)
 {
 	int	error;
 	int	i;

@@ -6,12 +6,11 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:49:01 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 20:49:59 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:01:20 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_sem.h"
-
 
 /**
  * Indicates the philosopher thread to start eating:
@@ -47,8 +46,8 @@ static void	eating(t_philosopher *seat)
 	usleep((seat->table->time_to_eat * 1000));
 	if (seat->table->meals_required)
 	{
-		if (++seat->meals_eaten >= seat->table->meals_required 
-		&& !seat->max_meals_achieved)
+		if (++seat->meals_eaten >= seat->table->meals_required
+			&& !seat->max_meals_achieved)
 		{
 			if (safe_sem_post(seat->table->sem_ready, "/ready", -1))
 				exit(PH_SEM_PERR);

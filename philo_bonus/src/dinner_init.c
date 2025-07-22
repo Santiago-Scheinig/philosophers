@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 19:36:30 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 19:48:35 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:03:06 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
  * @param thd_c The third of the local threads.
  * @return The exit status of the threads.
  */
-static int	join_threads(pthread_t thd_a, pthread_t thd_b,  pthread_t thd_c)
+static int	join_threads(pthread_t thd_a, pthread_t thd_b, pthread_t thd_c)
 {
 	void		*ret;
 
@@ -29,12 +29,12 @@ static int	join_threads(pthread_t thd_a, pthread_t thd_b,  pthread_t thd_c)
 		return (PH_THD_JERR);
 	if (ret)
 		return ((__intptr_t)ret);
-	ret = NULL;	
+	ret = NULL;
 	if (pthread_join(thd_b, &ret) != 0)
 		return (PH_THD_JERR);
 	if (ret)
 		return ((__intptr_t)ret);
-	ret = NULL;	
+	ret = NULL;
 	if (pthread_join(thd_c, &ret) != 0)
 		return (PH_THD_JERR);
 	if (ret)
@@ -142,7 +142,7 @@ static void	create_monitor(t_rules *table)
 	pthread_t	thd_start_id;
 	int			pcs_status;
 	int			thd_status;
-	
+
 	table->pid_id[0] = fork();
 	if (table->pid_id[0] < 0)
 		forcend(table, PH_PCS_CERR);
@@ -161,7 +161,7 @@ static void	create_monitor(t_rules *table)
 			exit(pcs_status);
 		exit(thd_status);
 	}
-}	
+}
 
 /**
  * Initializes all necesary proccesses to run the philosopher program.

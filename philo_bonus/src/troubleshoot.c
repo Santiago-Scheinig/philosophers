@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 12:00:38 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 20:40:04 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:02:19 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ static void	split_free(char **split)
 	i = -1;
 	while (split[++i])
 		free(split[i]);
-	free(split);	
+	free(split);
 }
 
 /**
@@ -90,8 +90,8 @@ static void	print_err(const char *msg[], int errmsg)
 {
 	if (errmsg)
 	{
-		if (errmsg == PH_THD_JERR || errmsg == PH_PID_MERR 
-		|| errmsg == PH_THD_EERR || errmsg == PH_KILL_ERR)
+		if (errmsg == PH_THD_JERR || errmsg == PH_PID_MERR
+			|| errmsg == PH_THD_EERR || errmsg == PH_KILL_ERR)
 			printf("FATAL: %s. Force manual exit.\n", msg[errmsg]);
 		else
 			printf("ERROR: %s\n", msg[errmsg]);
@@ -125,6 +125,7 @@ void	forcend(t_rules *table, int errmsg)
 		"memory allocation failed",
 		"function kill() failed. Unable to terminate failing proccesses.",
 	};
+
 	print_err(msg, errmsg);
 	cleanup_all(table);
 	exit(errmsg);

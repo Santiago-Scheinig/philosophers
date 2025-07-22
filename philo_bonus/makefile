@@ -125,7 +125,7 @@ bonus: $(NAME_DEPS) $(LIB_BON) src/main_bonus.c
 
 debug:
 	@echo "$(C_R)[i] $(NAME) - debug program built successfully.$(C_END)"
-	@$(CC) $(CPPFLAGS) $(CFLAGS) debug/main_reset.c -o philo_debug
+	@$(CC) $(CPPFLAGS) $(CFLAGS) debug/debug.c -o philo_debug
 
 # Removes every object inside $(OBJ_DIR) and the directory itself.			#
 clean:

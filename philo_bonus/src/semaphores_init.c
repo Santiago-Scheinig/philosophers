@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 15:23:49 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 19:59:11 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:03:47 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,15 +58,11 @@ static void	initialize_sem_philo(t_rules *table)
 	if (!table->sem_names)
 		forcend(table, PH_MEM_AERR);
 	table->sem_names[table->n_philo + 1] = NULL;
-	while(++i < table->n_philo + 1)
+	while (++i < table->n_philo + 1)
 	{
 		table->sem_names[i] = malloc(20 * sizeof(char));
-		if (!table->sem_names[i])//make a troubleshoot function that also sem_close and unlinks the created sem
-		{
-			while (--i >= 0)
-				free(table->sem_names[i]);
-			forcend(table, PH_MEM_AERR);
-		}
+		if (!table->sem_names[i])
+			cleanup_philo_sem(table, i);
 		memset(table->sem_names[i], 0, (20 * sizeof(char)));
 		table->sem_names[i] = get_sem_name("/philo_", table->sem_names[i], i);
 		name = table->sem_names[i];

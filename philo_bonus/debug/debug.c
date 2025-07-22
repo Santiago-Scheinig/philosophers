@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main_reset.c                                       :+:      :+:    :+:   */
+/*   debug.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 17:01:44 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 18:29:11 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 21:05:10 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ static char	*get_sem_name(char *name, int id)
 	return (name);
 }
 
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
 	char	*name;
 	int		n_philo;
