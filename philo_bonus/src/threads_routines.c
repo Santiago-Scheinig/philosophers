@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:34:46 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 19:50:05 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:38:53 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,13 +26,13 @@ void	*monitor_death(void *arg)
 	int		i;
 
 	table = (t_rules *) arg;
-	if (safe_sem_wait(table->sem_death, "/death"))
+	if (safe_sem_wait(table->sem_death, "/death", -1))
 		THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
 	if (try_exit_and_kill(table, PH_SUCCESS))
 		THREAD_ERR(PH_PCS_KERR);
 	i = -1;
 	while (++i < table->n_philo)
-		if (safe_sem_post(table->sem_ready, "/ready"))
+		if (safe_sem_post(table->sem_ready, "/ready", -1))
 			THREAD_ERR(PH_SEM_PERR);
 	return (NULL);
 }
@@ -52,14 +52,16 @@ void	*monitor_meals(void *arg)
 
 	table = (t_rules *) arg;
 	i = -1;
-	if (safe_sem_wait(table->sem_start, "/start"))
+	if (safe_sem_wait(table->sem_start, "/start", -1))
 		THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
 	while (++i < table->n_philo)
-		if (safe_sem_wait(table->sem_ready, "/ready"))
+		if (safe_sem_wait(table->sem_ready, "/ready", -1))
 			THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
+	if (safe_sem_wait(table->sem_print, "/print", -1))
+		THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
 	if (try_exit_and_kill(table, PH_SUCCESS))
 		THREAD_ERR(PH_PCS_KERR);
-	if (safe_sem_post(table->sem_death, "/death"))
+	if (safe_sem_post(table->sem_death, "/death", -1))
 		THREAD_ERR(PH_SEM_PERR);
 	return (NULL);
 }
@@ -80,11 +82,11 @@ void	*monitor_start(void *arg)
 	table = (t_rules *) arg;
 	i = -1;
 	while (++i < table->n_philo)
-		if (safe_sem_wait(table->sem_ready, "/ready"))
+		if (safe_sem_wait(table->sem_ready, "/ready", -1))
 			THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
 	i = -1;
 	while (++i < (table->n_philo + 1))
-		if (safe_sem_post(table->sem_start, "/start"))
+		if (safe_sem_post(table->sem_start, "/start", -1))
 			THREAD_ERR(try_exit_and_kill(table, PH_SEM_PERR));
 	return (NULL);
 }
@@ -100,13 +102,26 @@ void	*monitor_start(void *arg)
  */
 void	*philo_death(void *arg)
 {
-	t_philosopher *seat;
+	t_philosopher	*seat;
+	struct timeval	day_time;
+	struct timeval	last_meal;
+	long			ms_last_meal;
+	long			ms_day_time;
 	
 	seat = (t_philosopher *) arg;
+	while (to_time_value(seat, SEM_TIME_IS).tv_sec == -1)
+		usleep(1000);
 	while (1)
 	{
-		printf("Im cheking\n");
-		usleep(10000);
+		gettimeofday(&day_time, NULL);
+		last_meal = to_time_value(seat, SEM_TIME_IS);
+		ms_last_meal = (last_meal.tv_sec * 1000L) + (last_meal.tv_usec / 1000);
+		ms_day_time = (day_time.tv_sec * 1000L) + (day_time.tv_usec / 1000);
+		if (seat->table->time_to_die < ms_day_time - ms_last_meal)
+		{
+			to_print_access(seat, SEM_PRINT_DEATH);
+			return (NULL);
+		}
+		usleep(1000);
 	}
-	return (NULL);
 }

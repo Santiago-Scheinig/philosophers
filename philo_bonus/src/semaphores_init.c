@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 15:23:49 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 18:59:31 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:50:20 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
  * @param base_name The type that identifies the semaphore.
  * @param name A pointer to an allocated string where to save the name.
  * @param id The id that identifies the semaphore.
+ * @return The unique name for a semaphore based on parameters.
  */
 static char	*get_sem_name(const char *base_name, char *name, int id)
 {
@@ -60,7 +61,7 @@ static void	initialize_sem_philo(t_rules *table)
 	while(++i < table->n_philo + 1)
 	{
 		table->sem_names[i] = malloc(20 * sizeof(char));
-		if (!table->sem_names[i])
+		if (!table->sem_names[i])//make a troubleshoot function that also sem_close and unlinks the created sem
 		{
 			while (--i >= 0)
 				free(table->sem_names[i]);
@@ -92,21 +93,21 @@ void	unlink_semaphores(t_rules *table)
 
 	ans = 0;
 	if (sem_unlink("/death"))
-		ans += printf("Error: Unable to unlink /death semaphore\n");
+		ans += printf("sem: unable to unlink /death semaphore\n");
 	if (sem_unlink("/print"))
-		ans += printf("Error: Unable to unlink /print semaphore\n");
+		ans += printf("sem: unable to unlink /print semaphore\n");
 	if (sem_unlink("/forks"))
-		ans += printf("Error: Unable to unlink /forks semaphore\n");
+		ans += printf("sem: unable to unlink /forks semaphore\n");
 	if (sem_unlink("/start"))
-		ans += printf("Error: Unable to unlink /start semaphore\n");
+		ans += printf("sem: unable to unlink /start semaphore\n");
 	if (sem_unlink("/ready"))
-		ans += printf("Error: Unable to unlink /ready semaphore\n");
+		ans += printf("sem: unable to unlink /ready semaphore\n");
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
 		name = table->sem_names[i];
 		if (sem_unlink(name))
-			ans += printf("Error: Unable to unlink %s semaphore\n", name);
+			ans += printf("sem: unable to unlink %s semaphore\n", name);
 	}
 }
 
@@ -127,21 +128,21 @@ void	close_semaphores(t_rules *table)
 
 	ans = 0;
 	if (sem_close(table->sem_death))
-		ans += printf("Error: Unable to close /death semaphore\n");
+		ans += printf("sem: unable to close /death semaphore\n");
 	if (sem_close(table->sem_print))
-		ans += printf("Error: Unable to close /print semaphore\n");
+		ans += printf("sem: unable to close /print semaphore\n");
 	if (sem_close(table->sem_forks))
-		ans += printf("Error: Unable to close /forks semaphore\n");
+		ans += printf("sem: unable to close /forks semaphore\n");
 	if (sem_close(table->sem_start))
-		ans += printf("Error: Unable to close /start semaphore\n");
+		ans += printf("sem: unable to close /start semaphore\n");
 	if (sem_close(table->sem_ready))
-		ans += printf("Error: Unable to close /ready semaphore\n");
+		ans += printf("sem: unable to close /ready semaphore\n");
 	i = -1;
 	while (++i < table->n_philo + 1)
 	{
 		name = table->sem_names[i];
 		if (sem_close(table->sem_philo[i]))
-			ans += printf("Error: Unable to close %s  semaphore\n", name);
+			ans += printf("sem: unable to close %s  semaphore\n", name);
 	}
 }
 

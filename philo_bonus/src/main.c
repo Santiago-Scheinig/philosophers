@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:02 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 18:55:32 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 16:27:41 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,5 +59,4 @@ int	main(int argc, char **argv)
 	check_args(argc, argv, &table);
 	initialize_semaphores(&table);
 	initialize_dinner(&table);
-	forcend(&table, PH_SUCCESS);
 }

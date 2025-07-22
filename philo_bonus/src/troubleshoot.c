@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 12:00:38 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 19:32:56 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 18:36:21 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,11 +47,10 @@ void	forcend(t_rules *table, int errmsg)
 		"waitpid of child proccess failed",
 		"memory allocation failed",
 	};
-	if (errmsg)//PH_THD_JERR || PH_MTR_WERR || PH_FATAL_ERROR are FATAL errors.
+	if (errmsg)//PH_THD_JERR || PH_PID_MERR || PH_THD_EERR || PH_KILL_ERR are FATAL errors.
 		printf("ERROR: %s\n", msg[errmsg]);
 	if (table)
 	{
-		//waitpid in case of proccess exit!
 		if (table->sem_philo)
 		{
 			close_semaphores(table);

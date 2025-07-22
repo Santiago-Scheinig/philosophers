@@ -4,13 +4,14 @@
 NAME		=	philo_bonus
 
 # The name list for regular and bonus source files.							#
-SRC			=	$(SRC_DIR)/ft_atoi.c				\
-				$(SRC_DIR)/dinner_init.c			\
-				$(SRC_DIR)/troubleshoot.c			\
-				$(SRC_DIR)/threads_routines.c		\
-				$(SRC_DIR)/semaphores_init.c		\
-				$(SRC_DIR)/semaphores_actions.c		\
-				$(SRC_DIR)/philosopher_proccess.c	\
+SRC			=	$(SRC_DIR)/ft_atoi.c					\
+				$(SRC_DIR)/dinner_init.c				\
+				$(SRC_DIR)/troubleshoot.c				\
+				$(SRC_DIR)/threads_routines.c			\
+				$(SRC_DIR)/semaphores_init.c			\
+				$(SRC_DIR)/semaphores_actions.c			\
+				$(SRC_DIR)/semaphores_troubleshoot.c	\
+				$(SRC_DIR)/philosopher_proccess.c		\
 
 # The flags used to compile the objects.									#
 CFLAGS		=	-g -Wall -Wextra -Werror

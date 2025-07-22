@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/08 19:36:30 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/17 19:51:18 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 19:48:35 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ static int	join_threads(pthread_t thd_a, pthread_t thd_b,  pthread_t thd_c)
  * 
  * - SIGKILL signal or EXIT status: means the proccess ended on error.
  * 
+ * @param table A pointer to the main enviroment philosopher structure.
  * @param status The current status of the dinner.
  * @return 0 on success. On any error, the program returns the error code.
  * @note If the current status of the dinner is different than 0, means an
@@ -109,11 +110,11 @@ static int	create_philosophers(t_rules *table)
 		table->pid_id[seat.id] = fork();
 		if (table->pid_id[seat.id] < 0)
 		{
-			if (safe_sem_post(table->sem_death, "/death"))
+			if (safe_sem_post(table->sem_death, "/death", -1))
 				return (try_exit_and_kill(table, PH_SEM_PERR));
 		}
 		if (!table->pid_id[seat.id])
-			philosophize(table, &seat);
+			philosophize(&seat);
 	}
 	return (PH_SUCCESS);
 }
@@ -179,9 +180,9 @@ void	initialize_dinner(t_rules *table)
 	memset(table->pid_id, -1, (table->n_philo + 2) * sizeof(pid_t));
 	create_monitor(table);
 	if (waitpid(table->pid_id[0], &status, 0) == -1)
-		printf("FATAL: can't wait for monitor.");//FATAL
+		forcend(table, PH_PID_MERR);
 	if (WIFSIGNALED(status))
-		forcend(table, PH_FATAL_ERROR);
+		forcend(table, PH_THD_EERR);
 	if (WIFEXITED(status))
 		forcend(table, status);
 }
