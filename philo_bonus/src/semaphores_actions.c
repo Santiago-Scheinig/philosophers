@@ -6,12 +6,23 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 18:47:45 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 19:42:28 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 20:44:45 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_sem.h"
 
+/**
+ * Using the T_SEM_TIME enum, executes instructions on the last_meal timestamp
+ * variable, saved on the T_PHILOSOPHER structure, avoiding data races using
+ * a semaphore.
+ * 
+ * @param seat A pointer to a T_PHILOSOPHER structure linked to the last_meal
+ * timestamp variable.
+ * @param action The action to perfrom into [last_meal_time].
+ * @return If is_eating is true, returns the current timeval. Else, returns 
+ * the [last_meal_time], on seat, in timeval.
+ */
 struct timeval to_time_value(t_philosopher *seat, t_sem_time action)
 {
 	struct timeval	val;
@@ -33,6 +44,12 @@ struct timeval to_time_value(t_philosopher *seat, t_sem_time action)
 	return (val);
 }
 
+/**
+ * Returns the current time of the dinner, using a start_time, in ms.
+ * 
+ * @param start_time The time in which the dinner started.
+ * @return The current time in ms. 
+*/
 static long	get_time_of_dinner(struct timeval start_time)
 {
 	struct timeval	tv;
@@ -45,6 +62,15 @@ static long	get_time_of_dinner(struct timeval start_time)
 	return (ms_tv - ms_start);
 }
 
+/**
+ * Terminates the program by signaling the monitor with the semaphore /death,
+ * then it prints the death message.
+ * 
+ * @param seat A pointer to the T_PHILOSOPHER linked to the message.
+ * @param ms_tv The current time in ms.
+ * @note After execution it exits, leaving /print semaphore in 0 and avoiding
+ * furhter messages.
+ */
 static void print_death_status(t_philosopher *seat, long ms_tv)
 {
 	if (safe_sem_post(seat->table->sem_death, "/death", -1))
@@ -53,6 +79,14 @@ static void print_death_status(t_philosopher *seat, long ms_tv)
 	exit(PH_SUCCESS);
 }
 
+/**
+ * Using the T_SEM_PRINT enum, prints a specific message on STDOUT linked to
+ * the pointer to a T_PHILOSOPHER seat, avoiding print chunks using 
+ * the /print semaphore.
+ * 
+ * @param seat A pointer to the T_PHILOSOPHER linked to the message.
+ * @param action The action that specifies the message to print.
+ */
 void	to_print_access(t_philosopher *seat, t_sem_print action)
 {
 	long ms_tv;

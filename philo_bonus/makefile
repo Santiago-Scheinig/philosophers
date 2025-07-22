@@ -81,7 +81,7 @@ C_END		=	\033[0m
 
 # ----------------------------- Makefile Body ----------------------------- #
 
-.PHONY: all clean fclean re bonus
+.PHONY: all clean fclean re bonus debug
 
 all: $(NAME)
 	@echo "$(C_G)[✓] $(NAME) - Program built successfully.$(C_END)"
@@ -123,8 +123,9 @@ bonus: $(NAME_DEPS) $(LIB_BON) src/main_bonus.c
 	src/main_bonus.c $(NAME_LIBS) $(LIB_BON) -o $(NAME)_bonus
 	@echo "$(C_G)[✓] $(NAME)_bonus - Program built successfully.$(C_END)"
 
-fix: src/main_reset
-	@$(CC) $(CPPFLAGS) $(CFLAGS) src/main_reset.c -o fix
+debug:
+	@echo "$(C_R)[i] $(NAME) - debug program built successfully.$(C_END)"
+	@$(CC) $(CPPFLAGS) $(CFLAGS) debug/main_reset.c -o philo_debug
 
 # Removes every object inside $(OBJ_DIR) and the directory itself.			#
 clean:
@@ -144,6 +145,8 @@ endif
 	@rm -rf $(DEP_DIR)
 	@rm -f $(NAME)
 	@rm -f $(NAME)_bonus
+	@rm -f philo_debug
+	@rm -rf debug/main_reset
 	@echo "$(C_B)[i] $(NAME) - Fully cleaned project files.$(C_END)"
 
 #- Restarts the Makefile. Erases everything to default, and executes again.	#

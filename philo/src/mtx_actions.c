@@ -6,14 +6,14 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 17:11:22 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:51:09 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 20:44:14 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
 /**
- * Using the t_mtx_flag enum, executes instructions on the death_flag
+ * Using the T_MTX_FLAG enum, executes instructions on the death_flag
  * variable, saved on the main experiment structure, avoiding data races using
  * a mutex.
  * 
@@ -48,7 +48,7 @@ int	to_death_flag(t_rules *table, t_mtx_flag action)
 }
 
 /**
- * Using the t_mtx_flag enum, executes instructions on the meals_eaten
+ * Using the T_MTX_FLAG enum, executes instructions on the meals_eaten
  * variable, saved on the T_PHILOSOPHER structure, avoiding data races using
  * a mutex.
  * 
@@ -84,13 +84,13 @@ int	to_meals_value(t_philosopher *seat, t_mtx_flag action)
 }
 
 /**
- * Using the t_mtx_time enum, executes instructions on the last_meal timestamp
+ * Using the T_MTX_TIME enum, executes instructions on the last_meal timestamp
  * variable, saved on the T_PHILOSOPHER structure, avoiding data races using
  * a mutex.
  * 
  * @param seat A pointer to a T_PHILOSOPHER structure linked to the last_meal
  * timestamp variable.
- * @param action The action to perfrom into meals_eaten.
+ * @param action The action to perfrom into last_meal_time.
  * @return If is_eating is true, returns the current timeval. Else, returns 
  * the last meal timeval on seat.
  */
@@ -136,7 +136,7 @@ static int	get_time_of_dinner(struct timeval start_time)
  * the pointer to a T_PHILOSOPHER seat, avoiding print chunks using a mutex.
  * 
  * @param seat A pointer to the T_PHILOSOPHER linked to the message.
- * @param action The action to perform into death_flag.
+ * @param action The action that specifies the message to print.
  */
 void	to_print_access(t_philosopher *seat, t_mtx_print action)
 {

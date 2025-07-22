@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 20:28:51 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 17:32:39 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 20:46:47 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,10 @@ static void	eating(t_philosopher *seat)
 /**
  * In case of odd [n_philosopher] amount, it verifies if the thread needs
  * to eat or not. To do so, compares the current time agains the [last_meal]
- * time, and verifies it against ([time_to_die] / 3).
+ * time, and verifies it against ([time_to_die] / 2).
  * 
  * @param seat A pointer to the T_PHILOSOPHER thread structure.
- * @return Returns 0 if it's less than ([time_to_die] / 3). Else, returns 1.
+ * @return Returns 0 if it's less than ([time_to_die] / 2). Else, returns 1.
  */
 static int	is_hungry(t_philosopher *seat)
 {

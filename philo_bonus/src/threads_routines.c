@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:34:46 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 19:38:53 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/22 20:22:11 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,8 +57,6 @@ void	*monitor_meals(void *arg)
 	while (++i < table->n_philo)
 		if (safe_sem_wait(table->sem_ready, "/ready", -1))
 			THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
-	if (safe_sem_wait(table->sem_print, "/print", -1))
-		THREAD_ERR(try_exit_and_kill(table, PH_SEM_WERR));
 	if (try_exit_and_kill(table, PH_SUCCESS))
 		THREAD_ERR(PH_PCS_KERR);
 	if (safe_sem_post(table->sem_death, "/death", -1))
