@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:34:46 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 21:01:46 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/23 17:35:58 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ void	*philo_death(void *arg)
 		last_meal = to_time_value(seat, SEM_TIME_IS);
 		ms_last_meal = (last_meal.tv_sec * 1000L) + (last_meal.tv_usec / 1000);
 		ms_day_time = (day_time.tv_sec * 1000L) + (day_time.tv_usec / 1000);
-		if (seat->table->time_to_die < ms_day_time - ms_last_meal)
+		if (seat->table->time_to_die <= ms_day_time - ms_last_meal)
 		{
 			to_print_access(seat, SEM_PRINT_DEATH);
 			return (NULL);

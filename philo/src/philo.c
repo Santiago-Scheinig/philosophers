@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/19 20:28:51 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 20:46:47 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/23 17:28:51 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,12 +65,12 @@ static void	eating(t_philosopher *seat)
 	{
 		grab_forks(seat);
 		to_time_value(seat, MTX_TIME_ISEATING);
+		to_time_value(seat, MTX_TIME_ISFULL);
 		to_print_access(seat, MTX_PRINT_EAT);
 		usleep((seat->table->time_to_eat * 1000));
 		to_meals_value(seat, MTX_FLAG_INC);
 		pthread_mutex_unlock(seat->left_fork);
 		pthread_mutex_unlock(seat->right_fork);
-		to_time_value(seat, MTX_TIME_ISFULL);
 	}
 }
 

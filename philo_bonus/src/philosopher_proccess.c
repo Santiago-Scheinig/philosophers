@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:49:01 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 21:01:20 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/23 17:36:31 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,9 @@ static void	eating(t_philosopher *seat)
 	if (safe_sem_wait(seat->table->sem_forks, "/forks", -1))
 		exit(PH_SEM_WERR);
 	to_print_access(seat, SEM_PRINT_FORK);
-	to_time_value(seat, SEM_TIME_ISEATING);
 	to_print_access(seat, SEM_PRINT_EAT);
+	to_time_value(seat, SEM_TIME_ISEATING);
+	to_time_value(seat, SEM_TIME_ISFULL);
 	usleep((seat->table->time_to_eat * 1000));
 	if (seat->table->meals_required)
 	{
@@ -56,7 +57,6 @@ static void	eating(t_philosopher *seat)
 	}
 	if (safe_sem_post(seat->table->sem_forks, "/forks", -1))
 		exit(PH_SEM_PERR);
-	to_time_value(seat, SEM_TIME_ISFULL);
 }
 
 /**
