@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/26 17:11:22 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 20:44:14 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/23 14:19:45 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,20 +149,20 @@ void	to_print_access(t_philosopher *seat, t_mtx_print action)
 		if (action == MTX_PRINT_DEATH)
 		{
 			to_death_flag(seat->table, MTX_FLAG_ON);
-			printf("%06lims %i died.\n", ms_tv, seat->id);
+			printf("%06li %i died.\n", ms_tv, seat->id);
 		}
 		else if (action == MTX_PRINT_EAT)
-			printf("%06lims %i is eating.\n", ms_tv, seat->id);
+			printf("%06li %i is eating.\n", ms_tv, seat->id);
 		else if (action == MTX_PRINT_FORK)
 		{
-			printf("%06lims %i has taken a fork.\n", ms_tv, seat->id);
+			printf("%06li %i has taken a fork.\n", ms_tv, seat->id);
 			if (seat->table->n_philo > 1)
-				printf("%06lims %i has taken a fork.\n", ms_tv, seat->id);
+				printf("%06li %i has taken a fork.\n", ms_tv, seat->id);
 		}
 		else if (action == MTX_PRINT_SLEEP)
-			printf("%06lims %i is sleeping.\n", ms_tv, seat->id);
+			printf("%06li %i is sleeping.\n", ms_tv, seat->id);
 		else if (action == MTX_PRINT_THINK)
-			printf("%06lims %i is thinking.\n", ms_tv, seat->id);
+			printf("%06li %i is thinking.\n", ms_tv, seat->id);
 	}
 	pthread_mutex_unlock(&(seat->table->print_mutex));
 }

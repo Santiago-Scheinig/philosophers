@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 18:42:32 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/10 18:38:51 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/23 14:27:09 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static	int	ft_issign(int c)
 static	int	ft_islong(long nbr)
 {
 	if (nbr < INT_MIN || nbr > INT_MAX)
-		return (0);
+		return (-1);
 	return (nbr);
 }
 

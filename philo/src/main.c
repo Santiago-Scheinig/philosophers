@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/09 15:59:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/16 15:41:46 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/23 14:34:26 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,33 @@ int	forcend(t_rules *table, t_philosopher *seats, int errmsg)
 }
 
 /**
+ * Verifies user input to not include the following:
+ * 
+ * - Empty arguments.
+ * 
+ * - Non numeric characters.
+ * 
+ * If any of those is found, returns PH_ARG_VINV. Else returns 0.
+ */
+static int	check_arg_validity(char **argv)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (argv[++i])
+	{
+		if (!argv[i][0])
+			return (PH_ARG_VINV);
+		j = -1;
+		while (argv[i][++j])
+			if (!argv[i][j] || (argv[i][j] < '0' || argv[i][j] > '9'))
+				return (PH_ARG_VINV);
+	}
+	return (PH_SUCCESS);
+}
+
+/**
  * Verifies user input and initializes the main enviroment structure with
  * all its data.
  * If either "n_philo" or "time_to_die" are 0, or if any other input 
@@ -61,6 +88,8 @@ static int	check_args(int argc, char **argv, t_rules *table)
 
 	if (argc < 5 || argc > 6)
 		return (forcend(NULL, NULL, PH_ARG_CINV));
+	if (check_arg_validity(argv))
+		return (forcend(NULL, NULL, PH_ARG_VINV));
 	i = 0;
 	memset(table, 0, sizeof(t_rules));
 	table->death_flag = -1;

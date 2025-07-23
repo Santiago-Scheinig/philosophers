@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 18:47:45 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 21:04:29 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/07/23 14:34:41 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,17 +98,17 @@ void	to_print_access(t_philosopher *seat, t_sem_print action)
 	if (action == SEM_PRINT_DEATH)
 		print_death_status(seat, ms_tv);
 	else if (action == SEM_PRINT_EAT)
-		printf("%06lims %i is eating.\n", ms_tv, seat->id);
+		printf("%06li %i is eating.\n", ms_tv, seat->id);
 	else if (action == SEM_PRINT_FORK)
 	{
-		printf("%06lims %i has taken a fork.\n", ms_tv, seat->id);
+		printf("%06li %i has taken a fork.\n", ms_tv, seat->id);
 		if (seat->table->n_philo > 1)
-			printf("%06lims %i has taken a fork.\n", ms_tv, seat->id);
+			printf("%06li %i has taken a fork.\n", ms_tv, seat->id);
 	}
 	else if (action == SEM_PRINT_SLEEP)
-		printf("%06lims %i is sleeping.\n", ms_tv, seat->id);
+		printf("%06li %i is sleeping.\n", ms_tv, seat->id);
 	else if (action == SEM_PRINT_THINK)
-		printf("%06lims %i is thinking.\n", ms_tv, seat->id);
+		printf("%06li %i is thinking.\n", ms_tv, seat->id);
 	if (safe_sem_post(seat->table->sem_print, "/print", -1))
 		exit(PH_SEM_PERR);
 }
