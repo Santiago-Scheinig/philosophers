@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 17:01:44 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 21:05:10 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:07:34 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ int	main(int argc, char **argv)
 		name = malloc(20 * sizeof(char));
 		name = get_sem_name(name, i);
 		sem_unlink(name);
+		printf("Semaphore %s unlinked\n", name);
 		free(name);
 	}
 }

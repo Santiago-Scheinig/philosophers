@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/12 17:49:05 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/22 21:04:06 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:40:07 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	safe_sem_post(sem_t *sem, const char *sem_name, int id)
  */
 int	safe_sem_wait(sem_t *sem, const char *sem_name, int id)
 {
-	while (sem_wait(sem) == -1)
+	if (sem_wait(sem) == -1)
 	{
 		if (errno != EINTR)
 		{
@@ -78,14 +78,18 @@ static int	kill_all(t_rules *table, int index)
 	while (index < table->n_philo)
 	{
 		if (kill(table->pid_id[index], SIGKILL) == -1)
+		{
 			error = 1;
+			if (errno != ESRCH)
+			{
+				printf("thd: kill %i pid proccess failed\n", index);
+				break ;
+			}
+		}
 		index++;
 	}
 	if (error)
-	{
-		if (kill(0, SIGKILL) == -1)
-			return (PH_KILL_ERR);
-	}
+		return (PH_KILL_ERR);
 	return (PH_PCS_KERR);
 }
 
@@ -115,11 +119,12 @@ int	try_exit_and_kill(t_rules *table, int errcode)
 			if (kill(table->pid_id[i], SIGTERM) == -1)
 			{
 				error = 1;
-				printf("thd: kill %i pid proccess failed\n", i);
+				if (errno != ESRCH)
+					printf("thd: kill %i pid proccess failed\n", i);
 			}
 		}
 		if (error)
-			return (kill_all(table, i));
+			kill_all(table, i);
 	}
 	if (safe_sem_post(table->sem_philo[0], "/philo_", 0))
 		return (kill_all(table, 1));

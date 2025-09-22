@@ -6,7 +6,7 @@
 /*   By: sscheini <sscheini@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/22 18:47:45 by sscheini          #+#    #+#             */
-/*   Updated: 2025/07/23 14:34:41 by sscheini         ###   ########.fr       */
+/*   Updated: 2025/09/22 17:05:49 by sscheini         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ static void	print_death_status(t_philosopher *seat, long ms_tv)
 {
 	if (safe_sem_post(seat->table->sem_death, "/death", -1))
 		exit(PH_SEM_PERR);
-	printf("%06lims %i died.\n", ms_tv, seat->id);
+	printf("%06li %i died.\n", ms_tv, seat->id);
 	exit(PH_SUCCESS);
 }
 
